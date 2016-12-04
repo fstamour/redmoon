@@ -1,0 +1,184 @@
+;;;; TODO Signature of programs (e.g. hash, "structural hash" (i.e. two code that have the same structural hash has the same structure).
+;;;; TODO compile-to-asm, disasm, compile-to-lisp
+;;;; TODO Macros! (might render the proofs complex
+;;;; TODO Make a git repo.
+;;;; TODO Analyze
+;;;; TODO   Order (e.g. O(n), O(n^2))
+;;;; TODO   Correctness
+
+(in-package mylisp)
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;; S ::= skip
+;;       | x := E
+;;       | S; S
+;;       | if B then S_1 else S_2 endif
+;;       | while B do D od
+;; B ::= true | false | not B | B and B | B or B | E ~ E
+;; E ::= n | x | -E | E + E | (E * E) | (E / E)
+
+;; Which is better?
+;; (case 'a ((while if true false) t))
+;; (member 'a '(while if true false))
+
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Predicates
+;;;;
+
+(defun var? (form)
+  (unless (or (listp form)
+              (member form '(while if true false)))
+    (symbolp form)))
+
+(defun assignation? (form)
+  (and (eq 'set (car form))
+       (oddp (length form))))
+
+(defun atom? (form)
+  (and (atom form)
+       (or (var? form)
+           (integerp form)
+           (eq 'true form)
+           (eq 'false form))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Environments
+;;;;
+
+(defun make-env (&optional plist) (plist-hash-table plist))
+
+(defun get-var (var env)
+  (let ((x (gethash var env)))
+    (if x
+        x
+        (error "Undefined variable ~S" var))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Types
+;;;;
+
+(defun to-bool (b)
+  (if b 'true 'false))
+
+(defun truep (b)
+  (if (eq 'true b)
+      t
+      (unless (eq 'false b)
+        (error "Boolean values must be 'true' or 'false'. Got ~S" b))))
+
+;;;;;;;;;;;;;;;;;;;;;;;;
+;;;; Eval
+;;;;
+
+(defun eval-atom (atom &optional (env (make-env)))
+  "Evalutate an atom (either a value or a variable)."
+  (cond
+    ((numberp atom)
+     (if (integerp atom)
+         atom
+         (error "Non-integer numbers are not supported")))
+    ((eq 'true atom) atom)
+    ((eq 'false atom) atom)
+    ((var? atom)
+     (nth-value 0 (get-var atom env)))))
+
+(defun eval-set (form env)
+  ;; TODO Docstring
+  (loop :for (var value) :on (rest form) :by #'cddr
+        ;; TODO check (var? var)
+        :do
+           ;; (if *trace-assignations*) ;; TODO
+           (setf (gethash var env) (eval value env))))
+
+(defun eval-if (form &optional (env (make-env)))
+  "Eval an if statement (or is it an expression?)."
+  (destructuring-bind (test-form then-form &optional else-form)
+      (rest form)
+    (if (truep (eval test-form env))
+        (eval then-form env)
+        (when else-form
+          (eval else-form env)))))
+
+(defun eval-while (form &optional (env (make-env)))
+  "Eval an if while (or is it an expression?)."
+  (destructuring-bind (condition body)
+      (rest form)
+    (loop :while (truep (eval condition env))
+          :do (eval body env))))
+
+(defun map-eval (form-list env)
+  "Eval a list of form and return a list of result."
+  (loop :for form :in form-list
+        :collect (eval form env)))
+
+(defun eval-not (form env)
+  "Eval a form '(not ...)'"
+  ;; TODO Check lenght = 2
+  (ecase (eval (second form) env)
+    (true 'false)
+    (false 'true)))
+
+(defun eval-or (form env)
+  "Eval a form '(or ...)'"
+  (to-bool (loop :for f :in (rest form)
+                 :for truth = (eval f env)
+                   :thereis (truep truth))))
+
+(defun eval-and (form env)
+  "Eval a form '(and ...)'"
+  (to-bool (loop :for f :in (rest form)
+                 :for truth = (eval f env)
+                 :always (not (truep truth)))))
+
+(defparameter *eval-depth* 0)
+(defun eval (form &optional (env (make-env)))
+  (unless form
+    (error "Invalid form 'NIL'"))
+  (let ((*eval-depth* (1+ *eval-depth*)))
+    (if (< 100 *eval-depth*) (error "Max eval depth exceeded."))
+    (if (atom? form)
+        ;; Atom
+        (eval-atom form env)
+        (case (car form)
+;;; Statements
+          (set (eval-set form env))
+          (while (eval-while form env))
+          (if (eval-if form env))
+;;; Boolean operators
+          (not (eval-not form env))
+          (or (eval-or form env))
+          (and (eval-and form env))
+;;; Arithmetic and comparison
+          ((+ - * / mod < > =)
+           (let ((result (apply (symbol-function (car form))
+                                (map-eval (rest form) env))))
+             (if (numberp result)
+                 (nth-value 0 (floor result))
+                 (to-bool result))))
+;;; Ignored
+          ((declare meta assert ensure) nil) ;; TODO remove ensure
+          (t
+           (if (atom? (car form))
+;;; Function call
+               ;; Call-style (f 1 2) but arguments are named $0, $1 and so on.
+               (eval (get-var (car form) env)
+                     (let ((new-env (copy-hash-table env)))
+                       (loop :for expression :in (rest form)
+                             :for i :from 0
+                             :do (setf (gethash
+                                        (format-symbol t "$~D" i)
+                                        new-env)
+                                       (eval expression env)))
+                       new-env))
+               ;; Call-style  (f (x 1) (y 2))
+               #+nil (eval (get-var (car form) env)
+                           (let ((new-env (copy-hash-table env)))
+                             (loop :for (var value) :on (cadr form) :by #'cddr
+                                   :do (setf (gethash var new-env) value))
+                             new-env))
+;;; Sequence
+               (loop :for f :on form
+                     :for v = (eval (car f) env)
+                     :unless (cdr f) :return v)))))))
+
