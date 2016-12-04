@@ -26,6 +26,8 @@
 (trace eval
        eval-atom
        eval-while
+       eval-seq
+       eval-fn
        make-env
        get-var)
 
@@ -62,7 +64,13 @@
     (eval '(set x (- x 1)) env)
     (hash-table-plist env)))
 
-;;; TODO Sequence
+;;; Sequence
+
+(check ()
+  (results
+   (eval '(2 3 4) (make-env))
+   (eval '((+ 1 2)))
+   (eval '((+ x 2)) (make-env '(x 2)))))
 
 ;;; Boolean logic
 
@@ -116,11 +124,49 @@
           env)
     (hash-table-plist env)))
 
+;;; Definition
+
+;; Call eval-def
+(check ()
+  (results
+   (let ((env (make-env)))
+     (eval-def '(def x (+ 1 2)) env)
+     (hash-table-plist env))
+   (let ((env (make-env '(x 5))))
+     (eval-def '(def x (+ 1 2)) env)
+     (hash-table-plist env))))
+;; Call eval
+(check ()
+  (results
+   (let ((env (make-env)))
+     (eval '(def x (+ 1 2)) env)
+     (hash-table-plist env))
+   (let ((env (make-env '(x 5))))
+     (eval '(def x (+ 1 2)) env)
+     (hash-table-plist env))
+   (let ((env (make-env)))
+     (eval '(def x (a) ((set a (+ 1 a))
+                        (* a 2))) env)
+     (hash-table-plist env))))
+
+(check ()
+  (results
+   (let ((env (make-env)))
+     (eval '(def x (+ 1 2)) env)
+     (hash-table-plist env))
+   (let ((env (make-env '(x 5))))
+     (eval '(def x (+ 1 2)) env)
+     (hash-table-plist env))))
+
+
 ;;; "Function call"
 
-;; This should fail: (eval '(x asd))
-#+nil
+;; Should fail:
+;;  (eval-fun '(f) (make-env))
+;;  (eval-fun '(f) (make-env '(f 0)))
 (check ()
-  (eval '(x (y 4)) (make-env '(x (* 2 y)))))
+  (results
+   (eval-fun '(f 2) (make-env '(f ((a) a))))
+   (eval-fun '(f 2) (make-env '(f ((a) (+ 1 a)))))))
 
 

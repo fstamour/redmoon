@@ -131,6 +131,53 @@
                  :for truth = (eval f env)
                  :always (not (truep truth)))))
 
+(defun eval-def (form env)
+  ;; TODO Warn about re-defininf something.
+  (setf (gethash (second form) env) (cddr form)))
+
+;; Just like progn
+(defun eval-seq (form env)
+  (loop :for f :on form
+        :for v = (eval (car f) env)
+        :unless (cdr f) :return v))
+
+(defun eval-fun (form env)
+  (let ((definition (or
+                     ;; FIXME I don't like it...
+                     ;; mixing top-level stuff with "low-level" stuff
+                     (gethash (car form) *top-level-environment*)
+                     (get-var (car form) env))))
+    ;; (format t "~&Def: ~A" definition)
+    (destructuring-bind (arguments &body body)
+        definition
+      ;; (format t "~&Args: ~A" arguments)
+      ;; (format t "~&Body: ~A" body)
+      (eval-seq body
+            (let ((new-env (make-env)))
+              (loop :for expression :in (rest form)
+                    :for arg :in arguments
+                    :for i :from 0
+                    :do (setf (gethash arg new-env)
+                              (eval expression env)))
+              new-env))))
+  ;; Call-style (f 1 2) but arguments are named $0, $1 and so on.
+  #+nil (eval (get-var (car form) env)
+              (let ((new-env (copy-hash-table env)))
+                (loop :for expression :in (rest form)
+                      :for i :from 0
+                      :do (setf (gethash
+                                 (format-symbol t "$~D" i)
+                                 new-env)
+                                (eval expression env)))
+                new-env))
+  ;; Call-style  (f (x 1) (y 2))
+  #+nil (eval (get-var (car form) env)
+              (let ((new-env (copy-hash-table env)))
+                (loop :for (var value) :on (cadr form) :by #'cddr
+                      :do (setf (gethash var new-env) value))
+                new-env)))
+
+
 (defparameter *eval-depth* 0)
 (defun eval (form &optional (env (make-env)))
   (unless form
@@ -156,29 +203,15 @@
              (if (numberp result)
                  (nth-value 0 (floor result))
                  (to-bool result))))
+;;; Definition
+          (def (eval-def form env))
 ;;; Ignored
           ((declare meta assert ensure) nil) ;; TODO remove ensure
           (t
-           (if (atom? (car form))
+           (if (var? (car form))
 ;;; Function call
-               ;; Call-style (f 1 2) but arguments are named $0, $1 and so on.
-               (eval (get-var (car form) env)
-                     (let ((new-env (copy-hash-table env)))
-                       (loop :for expression :in (rest form)
-                             :for i :from 0
-                             :do (setf (gethash
-                                        (format-symbol t "$~D" i)
-                                        new-env)
-                                       (eval expression env)))
-                       new-env))
-               ;; Call-style  (f (x 1) (y 2))
-               #+nil (eval (get-var (car form) env)
-                           (let ((new-env (copy-hash-table env)))
-                             (loop :for (var value) :on (cadr form) :by #'cddr
-                                   :do (setf (gethash var new-env) value))
-                             new-env))
+               (eval-fun form env)
 ;;; Sequence
-               (loop :for f :on form
-                     :for v = (eval (car f) env)
-                     :unless (cdr f) :return v)))))))
+               (eval-seq form env)))))))
+
 

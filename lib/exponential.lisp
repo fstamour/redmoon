@@ -1,7 +1,9 @@
 
-(in-package :mylisp.user)
+(cl:in-package :mylisp.user)
 
-;;;; First example
+(def odd (n)
+  (not (= 0 (mod n 2))))
+
 (def exp (a b)
   ;;   (ensure t)
   (set x a
@@ -14,12 +16,18 @@
              (set x (* x x)
                   y (/ y 2))))
   ;;(ensure (eq z (exp a b)))
-  z
-  )
+  z)
+
+(def f (x) (+ x 2))
+(run (f 2))
 
 
-(time
- (eval (getdef 'exp)
-       (make-env '(a 2 b 16
-                   odd (not (= 0 (mod $ 2)))))))
+(run (exp 2 5))
+
+;; Fast O_O
+(cl:time
+ (run (exp 2 200)))
+
+
+
 

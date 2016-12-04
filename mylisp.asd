@@ -8,5 +8,6 @@
   :components
   ((:file packages)
    (:file core :depends-on (packages))
-   (:file core.test :depends-on (core))))
+   (:file core.test :depends-on (core))
+   (:file top-level :depends-on (core))))
 

@@ -5,9 +5,14 @@
   (:import-from checkl
                 check
                 results)
-  (:export eval)
+  (:export eval
+           def
+           run
+           + - * / mod < > =
+           set
+           while)
   (:shadow eval))
 
-(defpackage mylsip.user
+(defpackage mylisp.user
   (:use mylisp))
 
