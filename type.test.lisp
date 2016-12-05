@@ -128,11 +128,11 @@
 (with-oddp-pairp
   (typeof 'oddp))
 
-;; FIXME Should add contraint (n :integer)
 (with-oddp-pairp
   (typeof '(oddp n)))
-
 
 (with-oddp-pairp
   (typeof-funcall '(oddp n) env constraint))
 
+(with-oddp-pairp
+  (typeof '(oddp n)))

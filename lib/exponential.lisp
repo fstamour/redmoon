@@ -1,8 +1,28 @@
 
 (cl:in-package :mylisp.user)
 
-(def odd (n)
+(def oddp (n)
   (not (= 0 (mod n 2))))
+
+(def pairp (n)
+  (not (oddp n)))
+
+(run (oddp 2))
+(run (oddp 1))
+
+(run (pairp 2))
+
+(type:typeof 'oddp)
+;; => (:FUNCTION ((:INTEGER :INTEGER) :INTEGER) :BOOL)
+
+(type:typeof '(oddp 2))
+;; => bool
+
+(type:typeof '(oddp n) *top-level-environment* (make-constraint))
+;; => bool
+
+(type:typeof 'pairp)
+;; => (:FUNCTION :INTEGER :BOOL)
 
 (def exp (a b)
   ;;   (ensure t)
@@ -28,6 +48,6 @@
 (cl:time
  (run (exp 2 200)))
 
-
+(get-var 'exp *to)
 
 

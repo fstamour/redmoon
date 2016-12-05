@@ -26,11 +26,13 @@
 ;;;; Predicates
 ;;;;
 
+;;; Symbolics
+
 (defun keyword? (form)
   (and (symbolp form)
-       (member form
-               '(if set while
-                 + - * / = < > true false))))
+       (member (make-keyword form)
+               '(:if :set :while
+                 :+ :- :* :/ := :< :> :true :false))))
 
 (defun var? (form)
   (unless (or (listp form)
@@ -42,13 +44,31 @@
        (oddp (length form))))
 
 (defun atom? (form)
-  (not (listp form))
-  #+nil
-  (and (atom form)
-       (or (var? form)
-           (integerp form)
-           (eq 'true form)
-           (eq 'false form))))
+  (not (listp form)))
+
+;;; Value Types
+
+(defun integer? (form)
+  (integerp form))
+
+(defun bool? (form)
+    (and (symbolp form)
+     (let ((form (make-keyword form)))
+       (or (eq form :true)
+           (eq form :false)))))
+
+#+nil
+(defun function? (var env)
+  (let ((def (get-var var env nil)))
+    (if (cdr def) ;; "if there is at least tree elements"
+        t
+        nil)))
+
+(defun function? (value)
+  (and (list/p value)
+       (if (cdr value) ;; "if there is at least tree elements"
+           t
+           nil)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Environments
@@ -64,17 +84,19 @@
           (error "Undefined variable ~S" var)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; Types
+;;;; Host-guest type conversions
 ;;;;
 
 (defun to-bool (b)
-  (if b 'true 'false))
+  (if b :true :false))
 
-(defun truep (b)
-  (if (eq 'true b)
-      t
-      (unless (eq 'false b)
-        (error "Boolean values must be 'true' or 'false'. Got ~S" b))))
+(defun truep (b &optional (error-if-invalid t))
+  (let ((b (make-keyword b)))
+    (if (eq :true b)
+        t
+        (unless (eq :false b)
+          (when error-if-invalid
+            (error "Boolean values must be 'true' or 'false'. Got ~S" b))))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Eval
@@ -87,8 +109,8 @@
      (if (integerp atom)
          atom
          (error "Non-integer numbers are not supported")))
-    ((eq 'true atom) atom)
-    ((eq 'false atom) atom)
+    ((bool? atom) atom)
+    ((eq :false atom) atom)
     ((var? atom)
      (nth-value 0 (get-var atom env)))))
 
@@ -125,8 +147,8 @@
   "Eval a form '(not ...)'"
   ;; TODO Check lenght = 2
   (ecase (eval (second form) env)
-    (true 'false)
-    (false 'true)))
+    (:true :false)
+    (:false :true)))
 
 (defun eval-or (form env)
   "Eval a form '(or ...)'"
@@ -150,41 +172,28 @@
         :for v = (eval (car f) env)
         :unless (cdr f) :return v))
 
-(defun eval-fun (form env)
-  (let ((definition (or
-                     ;; FIXME I don't like it...
-                     ;; mixing top-level stuff with "low-level" stuff
-                     (gethash (car form) *top-level-environment*)
-                     (get-var (car form) env))))
+(defun eval-funcall(form env)
+  (let ((definition (get-var (car form) env)))
     ;; (format t "~&Def: ~A" definition)
     (destructuring-bind (arguments &body body)
         definition
       ;; (format t "~&Args: ~A" arguments)
       ;; (format t "~&Body: ~A" body)
       (eval-seq body
-            (let ((new-env (make-env)))
-              (loop :for expression :in (rest form)
-                    :for arg :in arguments
-                    :for i :from 0 ;; TODO Use this (for better error message for example)
-                    :do (setf (gethash arg new-env)
-                              (eval expression env)))
-              new-env))))
-  ;; Call-style (f 1 2) but arguments are named $0, $1 and so on.
-  #+nil (eval (get-var (car form) env)
-              (let ((new-env (copy-hash-table env)))
-                (loop :for expression :in (rest form)
-                      :for i :from 0
-                      :do (setf (gethash
-                                 (format-symbol t "$~D" i)
-                                 new-env)
-                                (eval expression env)))
-                new-env))
-  ;; Call-style  (f (x 1) (y 2))
-  #+nil (eval (get-var (car form) env)
-              (let ((new-env (copy-hash-table env)))
-                (loop :for (var value) :on (cadr form) :by #'cddr
-                      :do (setf (gethash var new-env) value))
-                new-env)))
+                (let ((new-env (make-env)))
+                  ;; Add only functions to the new-env
+                  (loop :for name :being :the :hash-keys :of env
+                          :using (hash-value value)
+                        :when (function? value)
+                          :do (setf (gethash name new-env) value))
+                  ;; Then bind each argument to its value
+                  (loop :for expression :in (rest form)
+                        :for arg :in arguments
+                        :for i :from 0 ;; TODO Use this (for better error message for example)
+                        ;; TODO Warn when an arguments shadows a function name.
+                        :do (setf (gethash arg new-env)
+                                  (eval expression env)))
+                  new-env)))))
 
 
 (defparameter *eval-depth* 0)
@@ -217,7 +226,7 @@
           (t
            (if (var? (car form))
 ;;; Function call
-               (eval-fun form env)
+               (eval-funcall form env)
 ;;; Sequence
                (eval-seq form env)))))))
 

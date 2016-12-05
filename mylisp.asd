@@ -9,5 +9,7 @@
   ((:file packages)
    (:file core :depends-on (packages))
    (:file core.test :depends-on (core))
-   (:file top-level :depends-on (core))))
+   (:file top-level :depends-on (core))
+   (:file constraint :depends-on (packages))
+   (:file type :depends-on (constraint))))
 

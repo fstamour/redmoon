@@ -19,7 +19,8 @@
            get-var
            make-env
            *top-level-environment*
-           assignation? atom? keyword? var?)
+           assignation? atom? keyword? var?
+           bool? integer?)
   (:shadow eval))
 
 (defpackage :mylisp.type
@@ -34,5 +35,6 @@
 (defpackage mylisp.user
   (:use mylisp)
   (:import-from mylisp
+                def
                 run))
 

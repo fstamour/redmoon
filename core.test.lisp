@@ -19,7 +19,7 @@
    (assignation? '(not-set))
    (assignation? '(set x))))
 
-(check (:name :var?)
+(check (:name :atom?)
   (results
    (atom? '())
    (atom? 3)
@@ -71,6 +71,17 @@
     (eval '(set x (- x 1)) env)
     (hash-table-plist env)))
 
+;;; Predicates...
+
+(check (:name :bool?)
+  (results
+   (bool? 'true)
+   (bool? 'false)
+   (bool? :true)
+   (bool? :false)
+   (bool? '())
+   (bool? t)))
+
 ;;; Sequence
 
 (check ()
@@ -121,6 +132,7 @@
    (eval '(= 1 1 1 1))))
 
 ;;; Conditional
+;; TODO CHECKL!
 (eval-if '(if true 42 -1))
 (eval-if '(if false 42 -1))
 (eval-if '(if (< 1 0) 42 -1))
@@ -171,11 +183,10 @@
 ;;; "Function call"
 
 ;; Should fail:
-;;  (eval-fun '(f) (make-env))
-;;  (eval-fun '(f) (make-env '(f 0)))
+;;  (eval-funcallction '(f) (make-env))
+;;  (eval-funcallction '(f) (make-env '(f 0)))
 (check ()
   (results
-   (eval-fun '(f 2) (make-env '(f ((a) a))))
-   (eval-fun '(f 2) (make-env '(f ((a) (+ 1 a)))))))
-
+   (eval-funcallction '(f 2) (make-env '(f ((a) a))))
+   (eval-funcallction '(f 2) (make-env '(f ((a) (+ 1 a)))))))
 
