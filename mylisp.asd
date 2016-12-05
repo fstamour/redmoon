@@ -11,5 +11,9 @@
    (:file core.test :depends-on (core))
    (:file top-level :depends-on (core))
    (:file constraint :depends-on (packages))
-   (:file type :depends-on (constraint))))
+   (:file type :depends-on (constraint))
+   (:module lib
+    :components
+    ((:file oddp+pairp)))))
+
 

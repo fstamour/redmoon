@@ -2,12 +2,11 @@
 (in-package mylisp.type)
 
 
-
 (defun typeof-atom (atom env constraint)
   (cond
     ((bool? atom) :bool)
     ((integer? atom) :integer)
-    ((var? atom) (if (function? atom env)
+    ((var? atom) (if (function? (get-var atom env nil))
                      (typeof-function atom env constraint)
                      :var))
     ((keyword? atom) :keyword)))
@@ -39,7 +38,7 @@
     ;; Adjust the constraint on each arguments based on the function's type.
     (loop :for arg :in (rest form)
           :for type :in (ensure-list (second typeof-function))
-          :do (add-contraint arg type constraint))
+          :do (add-constraint arg type constraint))
 
     ;; The type of the function call is the return type of the function.
     (third typeof-function)))

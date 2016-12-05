@@ -29,7 +29,14 @@
         alexandria
         anaphora
         mylisp)
-  (:shadowing-import-from mylisp eval)
+  (:import-from checkl
+                check
+                results)
+  (:shadowing-import-from mylisp
+                          eval
+                          integer?
+                          bool?
+                          function?)
   (:export typeof))
 
 (defpackage mylisp.user

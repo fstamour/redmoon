@@ -83,6 +83,15 @@
         (when error-if-not-found
           (error "Undefined variable ~S" var)))))
 
+(defun make-funcall-env (env)
+  "Create an environment with only the function definitons"
+  (let ((new-env (copy-hash-table env)))
+    (loop :for name :being :the :hash-keys :of env
+            :using (hash-value value)
+          :when (function? value)
+            :do (setf (gethash name new-env) value))
+    new-env))
+
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Host-guest type conversions
 ;;;;
@@ -179,12 +188,7 @@
       ;; (format t "~&Args: ~A" arguments)
       ;; (format t "~&Body: ~A" body)
       (eval-seq body
-                (let ((new-env (make-env)))
-                  ;; Add only functions to the new-env
-                  (loop :for name :being :the :hash-keys :of env
-                          :using (hash-value value)
-                        :when (function? value)
-                          :do (setf (gethash name new-env) value))
+                (let ((new-env (make-funcall-env env)))
                   ;; Then bind each argument to its value
                   (loop :for expression :in (rest form)
                         :for arg :in arguments

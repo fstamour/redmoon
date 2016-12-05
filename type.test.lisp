@@ -11,16 +11,17 @@
              ;; (hash-table-plist env) ;; These test sould not change the environment.
              (hash-table-plist constraint))))
 
-(with-env (integer! 2 env constraint))
+(check (:name :integer!)
+  (results
+   (with-env (integer! 2 env constraint)) ;; FIXME it returns T instead of :integer
+   (with-env
+     (eval '(set x 42) env)
+     (integer! 'x env constraint))
+   (with-env
+     (eval '(set x true) env)
+     (integer! 'x env constraint))))
+
 ;; (with-env (integer! x env constraint)) => Fails "Var X is unbound"
-
-(with-env
-  (eval '(set x 42) env)
-  (integer! 'x env constraint))
-
-(with-env
-  (eval '(set x true) env)
-  (integer! 'x env constraint))
 
 
 (defparameter *forms*
@@ -92,26 +93,35 @@
         `(,form ,@(multiple-value-list
                    (with-env (typeof form))))))
 
-(typeof-test *forms*)
+;; (typeof-test *forms*)
 
-(with-env
-  (def n 0)
-  (typeof '(mod n 2)))
+(check (:name :mod)
+  (results
+   (with-env
+     (def n 0)
+     (typeof '(mod n 2)))
+   (with-env
+     (def n 0)
+     #+nil (integer! '(mod n 2) env constraint)
+     #+nil (integer* '(mod n 2) env constraint)
+     (integer? '(mod n 2))) ;; FIXME This returns nil, should return :integer, (n :integer)
+   ))
 
-(with-env
-  (def n 0)
-  #+nil (integer! '(mod n 2) env constraint)
-  #+nil (integer* '(mod n 2) env constraint)
-  (integer? '(mod n 2)))
 
-(with-env
-  (typeof '(< 1 0) env constraint))
+(check (:name :comparison)
+  (with-env
+    (typeof '(< 1 0) env constraint)))
 
-(typeof-test
- (remove-if-not #'(lambda (x) (and (listp x)
-                                   (eq 'if (first x))))
-                *forms*))
+(check (:name :if)
+  (typeof-test
+   (remove-if-not #'(lambda (x) (and (listp x)
+                                     (eq 'if (first x))))
+                  *forms*)))
 
+(check (:name :function-type)
+  (results
+   (typeof 'mylisp.user::oddp)
+   (typeof 'mylisp.user::pairp)))
 
 (typeof 'mylisp.user::exp)
 
