@@ -65,7 +65,7 @@
         nil)))
 
 (defun function? (value)
-  (and (list/p value)
+  (and (listp value)
        (if (cdr value) ;; "if there is at least tree elements"
            t
            nil)))
@@ -109,8 +109,7 @@
      (if (integerp atom)
          atom
          (error "Non-integer numbers are not supported")))
-    ((bool? atom) atom)
-    ((eq :false atom) atom)
+    ((bool? atom) (nth-value 0 (make-keyword atom)))
     ((var? atom)
      (nth-value 0 (get-var atom env)))))
 

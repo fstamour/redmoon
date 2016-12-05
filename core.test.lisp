@@ -1,5 +1,5 @@
-;; (checkl:checkl-store "program-proof.checkl")
-;; (checkl:checkl-load "program-proof.checkl")
+;; (checkl:checkl-store "core.test.checkl")
+;; (checkl:checkl-load "core.test.checkl")
 
 (in-package mylisp)
 
@@ -36,9 +36,6 @@
        eval-fn
        make-env
        get-var)
-
-;;;;;;;;;;;;; TODO Make a list of every forms that we would want to test
-;; So we could re-use this list for different function (eval, analise, order, proof...)
 
 ;;; Atom
 (check (:name :eval-atom)
@@ -102,40 +99,47 @@
          (lambda (&rest b) `(,op ,@b))
          (loop :for i :below n :collect '(true false))))
 
-(check () (mapcar 'eval (truth-table 'or 2)))
-(check () (mapcar 'eval (truth-table 'and 2)))
+(check (:name :or-2-truth-table) (mapcar 'eval (truth-table 'or 2)))
+(check (:name :and-2-truth-table) (mapcar 'eval (truth-table 'and 2)))
 
-(check ()
-  (to-bool 'true)
-  (to-bool 'false)
-  (to-bool nil)
-  (truep 'true)
-  (truep 'false))
+(check (:name :bool-conversion)
+  (results
+   (to-bool 'true)  ;; => :true
+   (to-bool 'anything) ;; => :true
+   (to-bool 'false) ;; => :true
+   (to-bool nil) ;; => :false
+   (truep 'true)
+   (truep 'false)))
 
 ;;; Comparison and arithmetic
 (check ()
   (results
-   (eval (+ 1 2))
-   (eval (* 2 2))
-   (eval '(+ x 1) (make-env '(x 0)))
-   (eval '(- x 1) (make-env '(x 0)))
-   (eval '(* x 1) (make-env '(x 0)))
-   (eval '(/ x 5) (make-env '(x 2)))
+   (eval (+ 1 2)) ; 3
+   (eval (* 2 2)) ; 4
+   (eval '(+ x 1) (make-env '(x 0))) ; 1
+   (eval '(- x 1) (make-env '(x 0))) ; -1
+   (eval '(* x 1) (make-env '(x 0))) ; 0
+   (eval '(/ x 5) (make-env '(x 2))) ; 0
 
    ;; TODO Completlty forgot to test #'mod.
+   (eval '(mod 10 2)) ; 0
+   (eval '(mod 11 3)) ; 2
 
-   (eval '(< x 1) (make-env '(x 0)))
-   (eval '(> x 1) (make-env '(x 0)))
-   (eval '(= x 1) (make-env '(x 0)))
-   (eval '(= x 1) (make-env '(x 1)))
-   (eval '(= 1 2))
-   (eval '(= 1 1 1 1))))
+   (eval '(< x 1) (make-env '(x 0))) ; true
+   (eval '(> x 1) (make-env '(x 0))) ; false
+   (eval '(= x 1) (make-env '(x 0))) ; false
+   (eval '(= x 1) (make-env '(x 1))) ; true
+   (eval '(= 1 2)) ; false
+   (eval '(= 1 1 1 1))) ; true
+  )
 
 ;;; Conditional
-;; TODO CHECKL!
-(eval-if '(if true 42 -1))
-(eval-if '(if false 42 -1))
-(eval-if '(if (< 1 0) 42 -1))
+
+(check (:name :if)
+  (results
+   (eval-if '(if true 42 -1))
+   (eval-if '(if false 42 -1))
+   (eval-if '(if (< 1 0) 42 -1))))
 
 ;;; Loop
 (check ()
@@ -183,10 +187,10 @@
 ;;; "Function call"
 
 ;; Should fail:
-;;  (eval-funcallction '(f) (make-env))
-;;  (eval-funcallction '(f) (make-env '(f 0)))
+;;  (eval-funcall '(f) (make-env))
+;;  (eval-funcall '(f) (make-env '(f 0)))
 (check ()
   (results
-   (eval-funcallction '(f 2) (make-env '(f ((a) a))))
-   (eval-funcallction '(f 2) (make-env '(f ((a) (+ 1 a)))))))
+   (eval-funcall '(f 2) (make-env '(f ((a) a))))
+   (eval-funcall '(f 2) (make-env '(f ((a) (+ 1 a)))))))
 
