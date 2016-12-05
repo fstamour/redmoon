@@ -64,13 +64,21 @@
 
 (type:typeof 'dist2)
 
-(def max (x y) (if (< x y) y x))
-(def min (x y) (if (> x y) y x))
+(cl:defmacro let (cl:&body body)
+  `(cl:let ((mylisp:*top-level-environment*
+              (alexandria:copy-hash-table mylisp:*top-level-environment*))
+            (mylisp.type:*top-level-constraint*
+              (alexandria:copy-hash-table mylisp.type:*top-level-constraint*)))
+     ,@body))
 
-(type:typeof 'max)
-(type:typeof 'min)
+(let
+    (def max (x y) (if (< x y) y x))
+  (def min (x y) (if (> x y) y x))
+
+  (checkl:check (:name :min-max-functions)
+    (type:typeof 'max)
+    (type:typeof 'min)))
 
 
- 
 
 

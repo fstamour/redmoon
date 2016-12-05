@@ -146,3 +146,6 @@
 
 (with-oddp-pairp
   (typeof '(oddp n)))
+
+
+(typeof 'mylisp.user::exp)

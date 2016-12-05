@@ -28,6 +28,7 @@
            get-var
            make-env
            *top-level-environment*
+           *top-level-constraint*
            assignation? atom? keyword? var?
            bool? integer? function?)
   (:shadow eval))
@@ -37,7 +38,8 @@
   (:use cl
         alexandria
         anaphora
-        mylisp)
+        mylisp
+        mylisp.utils)
   (:import-from checkl
                 check
                 results)
@@ -46,7 +48,8 @@
                           integer?
                           bool?
                           function?)
-  (:export typeof))
+  (:export typeof
+           *top-level-constraint*))
 
 (defpackage mylisp.user
   (:use mylisp)

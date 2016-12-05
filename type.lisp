@@ -1,6 +1,15 @@
 
 (in-package mylisp.type)
 
+;; TODO (define-condition type-error () )
+(defun make-type-error (format-string &rest args)
+  (apply #'format nil format-string args))
+#+nil
+(defun make-type-error (datum expected-type)
+  (make-condition
+   'type-error :datum datum
+               :expected-type expected-type))
+
 
 (defun typeof-atom (atom env constraint)
   (cond
@@ -10,6 +19,35 @@
                      (typeof-function atom env constraint)
                      :var))
     ((keyword? atom) :keyword)))
+
+;; FIXME Arg... We should differentiate if-statements from if-expressions
+;; In if-statement we don't care that the then-form as a different type
+;; than then else-form.
+;; But for an if-expression, we care.
+;; Must the else-form be required for an expression?
+;; Because, if not, the return type will either be nil (invalid) of (typeof then-form).
+;;
+;; NOTE: The only place an "if" is not an expression is inside a sequence.
+(defun typeof-if-statement (form env constraint)
+  (destructuring-bind (test-form then-form &optional else-form)
+      (rest form)
+    (if (eq :bool (typeof test-form env constraint))
+        `(:if-statement
+          ,(typeof then-form env constraint)
+          ,@(when else-form
+              (list (typeof else-form env constraint))))
+        (make-type-error "Malformed if: ~S" form))))
+
+(defun typeof-if-expression (form env constraint)
+  (destructuring-bind (test-form then-form else-form)
+      (rest form)
+    (if (eq :bool (typeof test-form env constraint))
+        (or
+         (merge-constraint (typeof then-form env constraint)
+                           (typeof else-form env constraint))
+         (make-type-error "Unable to merge constraints from both side of if-expression"))
+        (make-type-error "Malformed if (the condition is not a boolean expression): ~S"
+                         form))))
 
 (defun typeof-function (name env constraint)
   (let ((definition (get-var name env))
@@ -45,7 +83,8 @@
 
 (defun typeof (form  &optional
                        (env mylisp::*top-level-environment*)
-                       (constraint *top-level-constraint*))
+                       (constraint *top-level-constraint*)
+                       (expression-p t))
   (unless form
     (error "Invalid form 'NIL'"))
   (or
@@ -56,14 +95,9 @@
 ;;; Statements
          (set :set-statement)     ;; TODO
          (while :while-statement) ;; TODO
-         (if (destructuring-bind (test-form then-form &optional else-form)
-                 (rest form)
-               (if (eq :bool (typeof test-form env constraint))
-                   `(:if-statement
-                     ,(typeof then-form env constraint)
-                     ,@(when else-form
-                         (list (typeof then-form env constraint))))
-                   `(type-error ,(format nil "Malformed if: ~S" form)))))
+         (if (if expression-p
+                 (typeof-if-expression form env constraint)
+                 (typeof-if-statement form env constraint)))
 ;;; Boolean operators
          (not (bool! (second form) env constraint))
          ((or and) (bool* (rest form) env constraint))
@@ -81,8 +115,10 @@
 ;;; Function call
               (typeof-funcall form env constraint)
 ;;; Sequence
-              (loop :for f :in form
-                    :for x = (typeof f env constraint)
+              (dolist-butlast (f form)
+                              (typeof f env constraint nil)
+                              (typeof f env constraint))
+              #+nil(loop :for f :in form
+                    :for x = 
                     :return x)))))
    (error "Typeof of ~S is nil (this is a bug)." form)))
-
