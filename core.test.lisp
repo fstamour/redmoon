@@ -3,8 +3,6 @@
 
 (in-package mylisp)
 
-;; TODO Add tests for atom?
-
 (check (:name :var?)
   (results
    (var? 'x)
@@ -21,6 +19,14 @@
    (assignation? '(not-set))
    (assignation? '(set x))))
 
+(check (:name :var?)
+  (results
+   (atom? '())
+   (atom? 3)
+   (atom? 'v)
+   (atom? 'true)
+   (atom? 'false)))
+
 ;;; Trace for debugging.
 #+nil
 (trace eval
@@ -35,7 +41,7 @@
 ;; So we could re-use this list for different function (eval, analise, order, proof...)
 
 ;;; Atom
-(check ()
+(check (:name :eval-atom)
   (results
    (eval-atom 1)
    (eval-atom 2)
@@ -44,7 +50,7 @@
    (eval-atom 'x (plist-hash-table '(x 42)))))
 ;; Should fail: (check () (eval-atom 1.5))
 
-(check ()
+(check (:name :eval/atom)
   (results
    (eval 1)
    (eval 2)
@@ -56,6 +62,7 @@
 (check ()
   (let ((env (make-env)))
     (eval '(set x 1) env)
+    (eval '(set y false) env)
     (hash-table-plist env)))
 
 (check ()
@@ -97,19 +104,21 @@
 ;;; Comparison and arithmetic
 (check ()
   (results
+   (eval (+ 1 2))
+   (eval (* 2 2))
    (eval '(+ x 1) (make-env '(x 0)))
    (eval '(- x 1) (make-env '(x 0)))
    (eval '(* x 1) (make-env '(x 0)))
    (eval '(/ x 5) (make-env '(x 2)))
+
+   ;; TODO Completlty forgot to test #'mod.
+
    (eval '(< x 1) (make-env '(x 0)))
    (eval '(> x 1) (make-env '(x 0)))
    (eval '(= x 1) (make-env '(x 0)))
    (eval '(= x 1) (make-env '(x 1)))
    (eval '(= 1 2))
-   (eval '(= 1 1 1 1))
-
-   (eval (+ 1 2))
-   (eval (* 2 2))))
+   (eval '(= 1 1 1 1))))
 
 ;;; Conditional
 (eval-if '(if true 42 -1))
