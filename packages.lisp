@@ -1,7 +1,16 @@
 
-(defpackage mylisp
+(defpackage mylisp.utils
   (:use cl
         alexandria)
+  (:import-from checkl
+                check
+                results)
+  (:export dolist-butlast))
+
+(defpackage mylisp
+  (:use cl
+        alexandria
+        mylisp.utils)
   (:import-from checkl
                 check
                 results)
@@ -20,7 +29,7 @@
            make-env
            *top-level-environment*
            assignation? atom? keyword? var?
-           bool? integer?)
+           bool? integer? function?)
   (:shadow eval))
 
 (defpackage :mylisp.type
@@ -43,5 +52,8 @@
   (:use mylisp)
   (:import-from mylisp
                 def
-                run))
+                run)
+  (:export oddp pairp
+           exp))
+
 
