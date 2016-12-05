@@ -4,7 +4,7 @@
   :version "0.0.1"
   :author "Francis St-Amour"
   :licence "Public Domain"
-  :depends-on (:alexandria :checkl)
+  :depends-on (:alexandria :anaphora :checkl)
   :components
   ((:file packages)
    (:file core :depends-on (packages))
