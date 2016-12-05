@@ -26,9 +26,15 @@
 ;;;; Predicates
 ;;;;
 
+(defun keyword? (form)
+  (and (symbolp form)
+       (member form
+               '(if set while
+                 + - * / = < > true false))))
+
 (defun var? (form)
   (unless (or (listp form)
-              (member form '(while if true false)))
+              (keyword? form))
     (symbolp form)))
 
 (defun assignation? (form)
@@ -36,6 +42,8 @@
        (oddp (length form))))
 
 (defun atom? (form)
+  (not (listp form))
+  #+nil
   (and (atom form)
        (or (var? form)
            (integerp form)
@@ -48,11 +56,12 @@
 
 (defun make-env (&optional plist) (plist-hash-table plist))
 
-(defun get-var (var env)
+(defun get-var (var env &optional (error-if-not-found t))
   (let ((x (gethash var env)))
     (if x
         x
-        (error "Undefined variable ~S" var))))
+        (when error-if-not-found
+          (error "Undefined variable ~S" var)))))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Types
@@ -156,7 +165,7 @@
             (let ((new-env (make-env)))
               (loop :for expression :in (rest form)
                     :for arg :in arguments
-                    :for i :from 0
+                    :for i :from 0 ;; TODO Use this (for better error message for example)
                     :do (setf (gethash arg new-env)
                               (eval expression env)))
               new-env))))
@@ -197,7 +206,7 @@
           (or (eval-or form env))
           (and (eval-and form env))
 ;;; Arithmetic and comparison
-          ((+ - * / mod < > =)
+          ((+ - * / mod = < >)
            (let ((result (apply (symbol-function (car form))
                                 (map-eval (rest form) env))))
              (if (numberp result)
@@ -205,8 +214,6 @@
                  (to-bool result))))
 ;;; Definition
           (def (eval-def form env))
-;;; Ignored
-          ((declare meta assert ensure) nil) ;; TODO remove ensure
           (t
            (if (var? (car form))
 ;;; Function call
