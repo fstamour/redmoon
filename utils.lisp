@@ -25,8 +25,6 @@
         :output-p t)
   (let ((list (loop :for i :below 15 :collect i)))
     (dolist-butlast (el list)
-                    (format t "~&butlast: ~S" el)
-                    (progn
-                      (format t "~&last: ~A" el)
-                      el))))
+                    (list :butlasts el)
+                    (list :last el))))
 

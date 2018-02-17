@@ -32,7 +32,7 @@
   (and (symbolp form)
        (member (make-keyword form)
                '(:if :set :while
-                 :+ :- :* :/ := :< :> :true :false))))
+                 :+ :- :* :/ := :/= :< :> :<= :>= :true :false))))
 
 (defun var? (form)
   (unless (or (listp form)
@@ -218,7 +218,7 @@
           (or (eval-or form env))
           (and (eval-and form env))
 ;;; Arithmetic and comparison
-          ((+ - * / mod = < >)
+          ((+ - * / mod = /= < > <= >=)
            (let ((result (apply (symbol-function (car form))
                                 (map-eval (rest form) env))))
              (if (numberp result)
