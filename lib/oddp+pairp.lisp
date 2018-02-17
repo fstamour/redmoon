@@ -1,5 +1,5 @@
 
-(cl:in-package :mylisp.user)
+(cl:in-package :redmoon.user)
 
 (def oddp (n)
   (not (= 0 (mod n 2))))

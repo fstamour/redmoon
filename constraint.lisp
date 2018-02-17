@@ -1,5 +1,5 @@
 
-(in-package mylisp.type)
+(in-package redmoon.type)
 
 (defun make-constraint ()
   "Create an object to hold a collection of constraints."

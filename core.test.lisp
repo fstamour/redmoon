@@ -1,7 +1,7 @@
 ;; (checkl:checkl-store "core.test.checkl")
 ;; (checkl:checkl-load "core.test.checkl")
 
-(in-package mylisp)
+(in-package redmoon)
 
 (check (:name :var?)
   (results

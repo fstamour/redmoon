@@ -1,6 +1,6 @@
 (in-package :cl-user)
 
-(defpackage mylisp.test
+(defpackage redmoon.test
   (:import-from parachute
                 define-test
                 is isnt)
@@ -10,10 +10,10 @@
                 eql
                 equal
                 let)
-  (:import-from mylisp
+  (:import-from redmoon
                 def
                 run)
-  (:import-from mylisp.user
+  (:import-from redmoon.user
                 oddp pairp
                 exp))
 

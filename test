@@ -1,4 +1,4 @@
 #!/usr/bin/env bash
 
-lisp --eval "(require 'mylisp)" --eval "(asdf:test-system :mylisp)"
+lisp --eval "(require 'redmoon)" --eval "(asdf:test-system :redmoon)"
 

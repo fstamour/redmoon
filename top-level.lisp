@@ -1,5 +1,5 @@
 
-(in-package :mylisp)
+(in-package :redmoon)
 
 (defvar *top-level-environment* (make-env))
 

@@ -1,5 +1,5 @@
 
-(in-package mylisp.type)
+(in-package redmoon.type)
 
 ;; TODO (define-condition type-error () )
 (defun make-type-error (format-string &rest args)
@@ -82,7 +82,7 @@
     (third typeof-function)))
 
 (defun typeof (form  &optional
-                       (env mylisp::*top-level-environment*)
+                       (env redmoon::*top-level-environment*)
                        (constraint *top-level-constraint*)
                        (expression-p t))
   (unless form

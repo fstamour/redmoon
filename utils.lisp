@@ -1,6 +1,6 @@
 ;;;;;;; WIP
 
-(in-package :mylisp.utils)
+(in-package :redmoon.utils)
 
 ;; WIP
 #+nil

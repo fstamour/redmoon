@@ -1,11 +1,11 @@
 
-(defsystem :mylisp
+(defsystem :redmoon
   :description "Playing with an almost minimal programming language."
   :version "0.0.1"
   :author "Francis St-Amour"
   :licence "Public Domain"
   :depends-on (:alexandria :anaphora :checkl)
-  :in-order-to ((asdf:test-op (asdf:test-op :mylisp.test)))
+  :in-order-to ((asdf:test-op (asdf:test-op :redmoon.test)))
   :components
   ((:file packages)
    (:file utils :depends-on (packages))

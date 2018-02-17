@@ -6,7 +6,7 @@
 ;;;; TODO   Order (e.g. O(n), O(n^2))
 ;;;; TODO   Correctness
 
-(in-package mylisp)
+(in-package redmoon)
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;; S ::= skip

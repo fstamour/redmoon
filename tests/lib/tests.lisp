@@ -1,4 +1,4 @@
-(cl:in-package :mylisp.test)
+(cl:in-package :redmoon.test)
 
 (define-test odd
   :serial nil
@@ -17,7 +17,7 @@
   (is equal '(:function :integer :bool) (type:typeof 'oddp))
   (is equal '(:function :integer :bool) (type:typeof 'pairp))
   (is eq :bool (type:typeof '(oddp 2)))
-  (is eq :bool (type:typeof '(oddp n) mylisp:*top-level-environment* (type::make-constraint))))
+  (is eq :bool (type:typeof '(oddp n) redmoon:*top-level-environment* (type::make-constraint))))
 
 ;; TODO Don't mutate *top-level-environment*
 (define-test def

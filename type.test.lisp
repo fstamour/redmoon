@@ -1,5 +1,5 @@
 
-(in-package mylisp.type)
+(in-package redmoon.type)
 
 (defmacro with-env (&body body)
   "Return X, env, constraint"
@@ -55,8 +55,8 @@
     (not false)
     (not true)
 
-    ;; ,@(mylisp::truth-table 'or 2)
-    ;; ,@(mylisp::truth-table 'and 2)
+    ;; ,@(redmoon::truth-table 'or 2)
+    ;; ,@(redmoon::truth-table 'and 2)
     (and false false)
     (or true true)
     (and 1 2)
@@ -120,10 +120,10 @@
 
 (check (:name :function-type)
   (results
-   (typeof 'mylisp.user::oddp)
-   (typeof 'mylisp.user::pairp)))
+   (typeof 'redmoon.user::oddp)
+   (typeof 'redmoon.user::pairp)))
 
-(typeof 'mylisp.user::exp)
+(typeof 'redmoon.user::exp)
 
 (defmacro with-oddp-pairp (&body body)
   `(with-env
@@ -148,4 +148,4 @@
   (typeof '(oddp n)))
 
 
-(typeof 'mylisp.user::exp)
+(typeof 'redmoon.user::exp)

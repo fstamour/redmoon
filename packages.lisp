@@ -1,5 +1,5 @@
 
-(defpackage mylisp.utils
+(defpackage redmoon.utils
   (:use cl
         alexandria)
   (:import-from checkl
@@ -7,10 +7,10 @@
                 results)
   (:export dolist-butlast))
 
-(defpackage mylisp
+(defpackage redmoon
   (:use cl
         alexandria
-        mylisp.utils)
+        redmoon.utils)
   (:import-from checkl
                 check
                 results)
@@ -27,23 +27,24 @@
 
            get-var
            make-env
+           copy-env
            *top-level-environment*
            *top-level-constraint*
            assignation? atom? keyword? var?
            bool? integer? function?)
   (:shadow eval))
 
-(defpackage :mylisp.type
+(defpackage :redmoon.type
   (:nicknames type)
   (:use cl
         alexandria
         anaphora
-        mylisp
-        mylisp.utils)
+        redmoon
+        redmoon.utils)
   (:import-from checkl
                 check
                 results)
-  (:shadowing-import-from mylisp
+  (:shadowing-import-from redmoon
                           eval
                           integer?
                           bool?
@@ -51,9 +52,9 @@
   (:export typeof
            *top-level-constraint*))
 
-(defpackage mylisp.user
-  (:use mylisp)
-  (:import-from mylisp
+(defpackage redmoon.user
+  (:use redmoon)
+  (:import-from redmoon
                 def
                 run)
   (:export oddp pairp
