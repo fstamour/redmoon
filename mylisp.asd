@@ -5,6 +5,7 @@
   :author "Francis St-Amour"
   :licence "Public Domain"
   :depends-on (:alexandria :anaphora :checkl)
+  :in-order-to ((asdf:test-op (asdf:test-op :mylisp.test)))
   :components
   ((:file packages)
    (:file utils :depends-on (packages))
@@ -17,5 +18,4 @@
     :components
     ((:file oddp+pairp)
      (:file exponential)))))
-
 

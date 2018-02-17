@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+
+lisp --eval "(require 'mylisp)" --eval "(asdf:test-system :mylisp)"
+
