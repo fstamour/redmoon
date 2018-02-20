@@ -40,8 +40,10 @@
     (symbolp form)))
 
 (defun assignation? (form)
-  (and (eq 'set (car form))
-       (oddp (length form))))
+  (and
+   (listp form)
+   (eq 'set (car form))
+   (oddp (length form))))
 
 (defun atom? (form)
   (not (listp form)))
@@ -64,9 +66,10 @@
         t
         nil)))
 
-(defun function? (value)
-  (and (listp value)
-       (if (cdr value) ;; "if there is at least tree elements"
+(defun function? (form)
+  (and (listp form)
+       (not (assignation? form))
+       (if (cdr form) ;; "if there is at least tree elements"
            t
            nil)))
 
@@ -111,6 +114,7 @@
 ;;;; Eval
 ;;;;
 
+;; TODO Remove the (make-env)
 (defun eval-atom (atom &optional (env (make-env)))
   "Evalutate an atom (either a value or a variable)."
   (cond

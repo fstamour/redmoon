@@ -10,6 +10,7 @@
   :components ((:module tests
                 :components
                 ((:file package)
+                 (:file core)
                  (:module lib
                   :components
                   ((:file tests)))))))

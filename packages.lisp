@@ -14,24 +14,47 @@
   (:import-from checkl
                 check
                 results)
-  (:export eval
-           def
-           run
+  (:export
 
-           true false
-           + - * / mod < > =
-           not and or
-           set
-           while
-           if
+   ;; Main interface
+   eval
+   def
+   run
 
-           get-var
-           make-env
-           copy-env
-           *top-level-environment*
-           *top-level-constraint*
-           assignation? atom? keyword? var?
-           bool? integer? function?)
+   ;; keywords
+   true false
+   + - * / mod < > =
+   not and or
+   set
+   while
+   if
+
+   ;; Environment
+   get-var
+   make-env
+   copy-env
+   *top-level-environment*
+   *top-level-constraint*
+
+   ;; Predicates
+   assignation? atom? keyword? var?
+   bool? integer? function?
+
+   ;; Host-guest type conversions
+   to-bool
+   truep
+
+   ;; All kind of evaluations
+   eval-atom
+   eval-set
+   eval-if
+   eval-while
+   map-eval
+   eval-not
+   eval-or
+   eval-and
+   eval-seq
+   eval-funcall)
   (:shadow eval))
 
 (defpackage :redmoon.type
