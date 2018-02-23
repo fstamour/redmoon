@@ -1,0 +1,6 @@
+Dockerfile
+.*
+*.git
+*.FASL
+*.fasl
+*.lisp-temp
