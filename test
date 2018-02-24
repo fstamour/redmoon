@@ -1,4 +1,0 @@
-#!/usr/bin/env bash
-
-lisp --eval "(require 'redmoon)" --eval "(asdf:test-system :redmoon)"
-
