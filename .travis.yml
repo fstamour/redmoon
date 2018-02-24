@@ -4,7 +4,7 @@ services:
     - docker
 
 before_install:
-    - docker build -t redmoon .
+    - docker/build-docker-image.sh
 
 script:
     - docker run redmoon
