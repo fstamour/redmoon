@@ -79,6 +79,8 @@
 
 (defun make-env (&optional plist) (plist-hash-table plist))
 
+(defun copy-env (env) (copy-hash-table env))
+
 (defun get-var (var env &optional (error-if-not-found t))
   (let ((x (gethash var env)))
     (if x
