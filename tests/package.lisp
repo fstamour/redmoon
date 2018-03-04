@@ -20,17 +20,30 @@
 
 (in-package redmoon.test)
 
+(defun test-with-boolean-results (package)
+    (every #'(lambda (x)
+              (eq :passed (parachute:status x)))
+     (parachute:results
+      (parachute:test package))))
+
+(defun exit (code)
+  #+sbcl (sb-ext:exit :code code))
+
 (defun test-all ()
-  (parachute:test 'redmoon.test)
-  (parachute:test 'redmoon.test.core))
+  (and (test-with-boolean-results 'redmoon.test)
+       (test-with-boolean-results 'redmoon.test.core)
+       (exit 0))
+  (exit 1))
 
 (defpackage redmoon.test.core
-  (:use cl)
+  (:use cl alexandria)
   (:shadowing-import-from redmoon
-                          eval)
+                          eval
+                          not and or)
   (:use redmoon)
   (:shadowing-import-from parachute
-                          true false)
+                          true false
+                          of-type)
   (:use parachute)
   (:import-from redmoon.test
                 with-env))
