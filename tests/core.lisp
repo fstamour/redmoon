@@ -156,3 +156,28 @@
   (is = 3 (eval '(/ 10 3)))
   (is = 0 (eval '(/ x 5) (make-env '(x 2)))))
 
+(define-test mod
+  (is = 0 (eval '(mod 10 2)))
+  (is = 2 (eval '(mod 11 3))))
+
+(define-test comparison
+  (is eq :true (eval '(< x 1) (make-env '(x 0))))
+  (is eq :false (eval '(> x 1) (make-env '(x 0))))
+  (is eq :false (eval '(= x 1) (make-env '(x 0))))
+  (is eq :true (eval '(= x 1) (make-env '(x 1))))
+  (is eq :false (eval '(= 1 2)))
+  (is eq :true (eval '(= 1 1 1 1))))
+
+(define-test eval-if
+  (is = 42 (eval-if '(if true 42 -1)))
+  (is = -1 (eval-if '(if false 42 -1)))
+  (is = -1 (eval-if '(if (< 1 0) 42 -1))))
+
+(define-test loop
+  (is = 0
+      (eval '((while (> i 0)
+               (set i (- i 1)))
+              i)
+            (make-env '(i 5)))))
+
+

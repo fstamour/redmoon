@@ -1,40 +1,6 @@
 
 (in-package redmoon)
 
-;;; Comparison and arithmetic
-(check ()
-  (results
-
-   ;; TODO Completlty forgot to test #'mod.
-   (eval '(mod 10 2)) ; 0
-   (eval '(mod 11 3)) ; 2
-
-   (eval '(< x 1) (make-env '(x 0))) ; true
-   (eval '(> x 1) (make-env '(x 0))) ; false
-   (eval '(= x 1) (make-env '(x 0))) ; false
-   (eval '(= x 1) (make-env '(x 1))) ; true
-   (eval '(= 1 2)) ; false
-   (eval '(= 1 1 1 1))) ; true
-  )
-
-;;; Conditional
-
-(check (:name :if)
-  (results
-   (eval-if '(if true 42 -1))
-   (eval-if '(if false 42 -1))
-   (eval-if '(if (< 1 0) 42 -1))))
-
-;;; Loop
-(check ()
-  (let ((env (make-env '(x 5))))
-    (eval '(while (> x 0)
-            (set x (- x 1)))
-          env)
-    (hash-table-plist env)))
-
-;;; Definition
-
 ;; Call eval-def
 (check ()
   (results

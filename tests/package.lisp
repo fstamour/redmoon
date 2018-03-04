@@ -26,6 +26,7 @@
      (parachute:results
       (parachute:test package))))
 
+;; P.S. This is not fun to call from the repl...
 (defun exit (code)
   #+sbcl (sb-ext:exit :code code))
 
