@@ -1,4 +1,4 @@
-(cl:in-package :redmoon.test)
+(in-package :redmoon.test)
 
 (define-test odd
   :serial nil

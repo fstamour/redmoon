@@ -67,8 +67,8 @@
 (define-test bool?
   (true (redmoon:bool? :true))
   (true (redmoon:bool? :false))
-  (false (redmoon:bool? cl:t))
-  (false (redmoon:bool? cl:nil))
+  (false (redmoon:bool? t))
+  (false (redmoon:bool? nil))
   (false (redmoon:bool? 42)))
 
 
@@ -84,9 +84,9 @@
   (true (redmoon:function? '(this is ok))))
 
 (define-test to-bool
-  (is eq :true (redmoon:to-bool cl:t))
+  (is eq :true (redmoon:to-bool t))
   (is eq :true (redmoon:to-bool 42))
-  (is eq :false (redmoon:to-bool cl:nil)))
+  (is eq :false (redmoon:to-bool nil)))
 
 (define-test truep
   (true (redmoon:truep :true))
