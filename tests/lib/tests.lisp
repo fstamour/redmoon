@@ -19,9 +19,9 @@
   (is eq :bool (type:typeof '(oddp 2)))
   (is eq :bool (type:typeof '(oddp n) redmoon:*top-level-environment* (type::make-constraint))))
 
-;; TODO Don't mutate *top-level-environment*
 (define-test def
-  (is = 4
-      (def f (x) (+ x 2))
-      (run (f 2))))
+  (with-env
+    (is = 4
+        (def f (x) (+ x 2))
+        (run (f 2)))))
 

@@ -1,16 +1,6 @@
 
 (in-package redmoon.type)
 
-(defmacro with-env (&body body)
-  "Return X, env, constraint"
-  `(let* ((env (make-env))
-          (constraint (make-constraint))
-          (*top-level-environment* env)
-          (*top-level-constraint* constraint))
-     (values (progn ,@body)
-             ;; (hash-table-plist env) ;; These test sould not change the environment.
-             (hash-table-plist constraint))))
-
 (check (:name :integer!)
   (results
    (with-env (integer! 2 env constraint)) ;; FIXME it returns T instead of :integer

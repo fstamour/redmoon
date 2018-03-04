@@ -100,9 +100,8 @@
   (is eq :true (redmoon:eval-atom :true))
   (is eq :false (redmoon:eval-atom :false))
   (fail (redmoon:eval-atom 'x))
-  ;; TODO This fails saying the variable x doesn't exists
-  #+nil
-  (fail (let ((env (redmoon:make-env)))
-          (redmoon:eval-set '(set 'x 42) env)
-          (redmoon:eval-atom 'x env))))
+  (is 'eq 42
+      (with-env
+        (redmoon:eval-set '(set x 42) env)
+        (redmoon:eval-atom 'x env))))
 

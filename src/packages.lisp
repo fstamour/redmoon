@@ -34,6 +34,7 @@
    make-env
    copy-env
    *top-level-environment*
+   make-constraint
    *top-level-constraint*
 
    ;; Predicates
