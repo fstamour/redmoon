@@ -81,6 +81,8 @@
   (:import-from redmoon
                 def
                 run)
+  (:import-from redmoon.type
+                typeof)
   (:export oddp pairp
            exp))
 
