@@ -20,8 +20,8 @@
   (is eq :bool (type:typeof '(oddp n) redmoon:*top-level-environment* (type::make-constraint))))
 
 (define-test def
-  (with-env
-    (is = 4
+  (is = 4
+      (with-env
         (def f (x) (+ x 2))
         (run (f 2)))))
 
