@@ -212,7 +212,7 @@
   (let ((*eval-depth* (1+ *eval-depth*)))
     (if (< 100 *eval-depth*) (error "Max eval depth exceeded."))
     (if (atom? form)
-        ;; Atom
+;;; Atom
         (eval-atom form env)
         (case (car form)
 ;;; Statements
