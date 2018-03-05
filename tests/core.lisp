@@ -180,4 +180,7 @@
               i)
             (make-env '(i 5)))))
 
+#+nil
+(eval '(def x (a) ((set a (+ 1 a))
+                   (* a 2))) env)
 

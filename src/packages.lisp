@@ -55,7 +55,8 @@
    eval-or
    eval-and
    eval-seq
-   eval-funcall)
+   eval-funcall
+   eval-def)
   (:shadow eval))
 
 (defpackage :redmoon.type
