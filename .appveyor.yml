@@ -8,6 +8,6 @@ install:
   - C:\MinGW\msys\1.0\bin\bash -e -l -c "find /c/bin" # testing mingw
   - C:\MinGW\msys\1.0\bin\bash -e -l -c "uname -a"
   - c:\bin\roswell\ros --version
-  - c:\bin\roswell\ros config
+  # - c:\bin\roswell\ros config
   - c:\bin\roswell\ros install ccl-bin
 
