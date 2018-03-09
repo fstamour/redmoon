@@ -7,5 +7,5 @@ install:
   - 7z x roswell.zip -oc:\bin\
   - C:\MinGW\msys\1.0\bin\bash -e -l -c "find /c/bin" # testing mingw
   - c:\bin\roswell\ros --version
-  - c:\bin\roswell\ros install sbcl
+  - c:\bin\roswell\ros install ccl
 
