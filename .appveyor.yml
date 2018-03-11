@@ -17,7 +17,7 @@ install:
   - ps: copy-item docker/sbclrc -destination $HOME/.sbclrc
   - ps: add-content -path $HOME/.sbclrc -value '(push "c:/projects/redmoon/" asdf:*central-registry*)'
   - ps: cat $HOME/.sbclrc
-  - cmd: '"C:\Program Files\Steel Bank Common Lisp\1.4.2\sbcl" --noinform --non-interactive --eval "(ql:quickload :redmoon.test)"'
+  - cmd: '"C:\Program Files\Steel Bank Common Lisp\1.4.2\sbcl" --noinform --non-interactive --eval "(ql:quickload :redmoon.test)" --eval "(asdf:test-system :redmoon)"'
 
 # TODO Load some dependencies first (for potential caching).
 # TODO Tell asdf where to load redmoon from.
@@ -25,6 +25,7 @@ install:
 # TODO sbcl --noinform --eval '(ql:quickload :redmoon)' --eval '(sb-ext:save-lisp-and-die "redmoon.exe" :executable t)'
 
 build: off
+test: off
 
 
 
