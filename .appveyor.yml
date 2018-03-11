@@ -2,6 +2,7 @@ platform:
   - x64
 
 install:
+  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   - mkdir c:\bin
   - c:\MinGW\msys\1.0\bin\bash -e -l -c "uname -a"
   - ps: Invoke-WebRequest -UserAgent wget -Uri "https://beta.quicklisp.org/quicklisp.lisp" -OutFile quicklisp.lisp;
