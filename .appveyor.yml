@@ -21,4 +21,7 @@ install:
 # TODO Run the tests 
 # TODO sbcl --noinform --eval '(ql:quickload :redmoon)' --eval '(sb-ext:save-lisp-and-die "redmoon.exe" :executable t)'
 
+build: off
+
+
 
