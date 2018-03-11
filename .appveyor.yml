@@ -5,7 +5,7 @@ install:
   - c:\MinGW\msys\1.0\bin\bash -e -l -c "uname -a"
   - ps: Invoke-WebRequest -UserAgent wget -Uri "https://beta.quicklisp.org/quicklisp.lisp" -OutFile quicklisp.lisp;
   - ps: Invoke-WebRequest -UserAgent wget -Uri "https://superb-sea2.dl.sourceforge.net/project/sbcl/sbcl/1.4.2/sbcl-1.4.2-x86-windows-binary.msi" -OutFile sbcl.msi;
-  - ps: msiexec /i sbcl.msi /passive /qn /norestart /log sbcl-install.log TARGETDIR=c:\bin\sbcl
+  - ps: msiexec /i sbcl.msi /passive /qn /norestart /log sbcl-install.log INSTALLDIR=c:\bin\sbcl
   - c:\MinGW\msys\1.0\bin\bash -e -l -c "find /c/bin"
   - c:\bin\sbcl\sbcl.exe" --noinform --non-interactive --load quicklisp.lisp --eval '(quicklisp-quickstart:install)'
 
