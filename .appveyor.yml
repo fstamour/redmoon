@@ -1,27 +1,29 @@
 platform: x64
  
 cache:
-  - c:\bin
+  - c:\cache
 
 environment:
   SBCL_HOME: 'C:\Program Files\Steel Bank Common Lisp\1.4.2\'
 
 install:
-  - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
-  - mkdir c:\bin
-  - c:\MinGW\msys\1.0\bin\bash -e -l -c "uname -a"
-  - ps: Invoke-WebRequest -UserAgent wget -Uri "https://beta.quicklisp.org/quicklisp.lisp" -OutFile quicklisp.lisp;
-  - ps: Invoke-WebRequest -UserAgent wget -Uri "https://superb-sea2.dl.sourceforge.net/project/sbcl/sbcl/1.4.2/sbcl-1.4.2-x86-64-windows-binary.msi" -OutFile sbcl.msi;
+  # - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1')) # for rdp in the vm
+  - mkdir c:\cache
+  # TODO If (Test-Path c:\cache\...)
+  - ps: Invoke-WebRequest -UserAgent wget -Uri "https://beta.quicklisp.org/quicklisp.lisp" -OutFile c:/cache/quicklisp.lisp;
+  - ps: Invoke-WebRequest -UserAgent wget -Uri "https://superb-sea2.dl.sourceforge.net/project/sbcl/sbcl/1.4.2/sbcl-1.4.2-x86-64-windows-binary.msi" -OutFile c:/cache/sbcl.msi
   - cmd: start /wait msiexec /i sbcl.msi /quiet /qn /norestart /log sbcl-install.log # INSTALLDIR="c:\bin\sbcl"
-  # - ps: start-sleep -s 300
-  - cmd: '"C:\Program Files\Steel Bank Common Lisp\1.4.2\sbcl" --noinform --non-interactive --load quicklisp.lisp --eval "(quicklisp-quickstart:install)"'
+  - cmd: '"C:\Program Files\Steel Bank Common Lisp\1.4.2\sbcl" --noinform --non-interactive --load c:\cache\quicklisp.lisp --eval "(quicklisp-quickstart:install)"'
+  - ps: copy-item docker/sbclrc -destination $HOME/.sbclrc
+  - ps: add-content -path $HOME/.sbclrc -value '(push "c:/projects/" asdf:*central-registry*)'
 
 # TODO Load some dependencies first (for potential caching).
 # TODO Tell asdf where to load redmoon from.
 # TODO Run the tests 
 # TODO sbcl --noinform --eval '(ql:quickload :redmoon)' --eval '(sb-ext:save-lisp-and-die "redmoon.exe" :executable t)'
 
-build: off
+build:
+  - cmd: '"C:\Program Files\Steel Bank Common Lisp\1.4.2\sbcl" --noinform --non-interactive --eval "(ql:quickload :redmoon.test)"'
 
 
 
