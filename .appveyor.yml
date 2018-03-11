@@ -4,16 +4,17 @@ cache:
   - c:\cache
 
 environment:
+  CACHE: 'c:\cache\'
   SBCL_HOME: 'C:\Program Files\Steel Bank Common Lisp\1.4.2\'
 
 install:
   # - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1')) # for rdp in the vm
-  - mkdir -Force c:\cache
+  - ps: If(!(test-path $ENV:CACHE )) { mkdir $ENV:CACHE; }
   # TODO If (Test-Path c:\cache\...)
-  - ps: Invoke-WebRequest -UserAgent wget -Uri "https://beta.quicklisp.org/quicklisp.lisp" -OutFile c:\cache\quicklisp.lisp;
-  - ps: Invoke-WebRequest -UserAgent wget -Uri "https://superb-sea2.dl.sourceforge.net/project/sbcl/sbcl/1.4.2/sbcl-1.4.2-x86-64-windows-binary.msi" -OutFile c:\cache\sbcl.msi
-  - cmd: start /wait msiexec /i c:\cache\sbcl.msi /quiet /qn /norestart /log sbcl-install.log # INSTALLDIR="c:\bin\sbcl"
-  - cmd: '"C:\Program Files\Steel Bank Common Lisp\1.4.2\sbcl" --noinform --non-interactive --load c:\cache\quicklisp.lisp --eval "(quicklisp-quickstart:install)"'
+  - ps: Invoke-WebRequest -UserAgent wget -Uri "https://beta.quicklisp.org/quicklisp.lisp" -OutFile $ENV:CACHE\quicklisp.lisp;
+  - ps: Invoke-WebRequest -UserAgent wget -Uri "https://superb-sea2.dl.sourceforge.net/project/sbcl/sbcl/1.4.2/sbcl-1.4.2-x86-64-windows-binary.msi" -OutFile $ENV:CACHE\sbcl.msi
+  - cmd: start /wait msiexec /i %CACHE%\sbcl.msi /quiet /qn /norestart /log sbcl-install.log # INSTALLDIR="c:\bin\sbcl"
+  - cmd: '"C:\Program Files\Steel Bank Common Lisp\1.4.2\sbcl" --noinform --non-interactive --load %CACHE%\quicklisp.lisp --eval "(quicklisp-quickstart:install)"'
   - ps: copy-item docker/sbclrc -destination $HOME/.sbclrc
   - ps: add-content -path $HOME/.sbclrc -value '(push "c:/projects/redmoon/" asdf:*central-registry*)'
   - ps: cat $HOME/.sbclrc
