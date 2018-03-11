@@ -11,7 +11,6 @@ install:
   # - ps: start-sleep -s 300
   - ps: ls 
   - ps: ls c:\bin
-  - ps: cat sbcl-install.log
   - c:\bin\sbcl\sbcl.exe --noinform --non-interactive --load quicklisp.lisp --eval '(quicklisp-quickstart:install)'
 
 # TODO Load some dependencies first (for potential caching).
