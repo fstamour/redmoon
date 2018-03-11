@@ -3,6 +3,9 @@ platform: x64
 cache:
   - c:\bin
 
+environment:
+  SBCL_HOME: 'C:\Program Files\Steel Bank Common Lisp\1.4.2\'
+
 install:
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1'))
   - mkdir c:\bin
