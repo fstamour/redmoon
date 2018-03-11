@@ -11,6 +11,8 @@ environment:
 
 # TODO use the cache correctly
 install:
+  - cmd: echo %CACHE%
+  - ps: echo $ENV:CACHE
   - ps: iex ((new-object net.webclient).DownloadString('https://raw.githubusercontent.com/appveyor/ci/master/scripts/enable-rdp.ps1')) # for rdp in the vm
   - ps: If(!(test-path $ENV:CACHE )) { mkdir $ENV:CACHE; }
   # TODO If (Test-Path c:/cache\...)
