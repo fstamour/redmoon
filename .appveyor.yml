@@ -2,6 +2,7 @@ platform:
   - x64
 
 install:
+  - mkdir c:\bin
   - c:\MinGW\msys\1.0\bin\bash -e -l -c "uname -a"
   - ps: Invoke-WebRequest -UserAgent wget -Uri "https://beta.quicklisp.org/quicklisp.lisp" -OutFile quicklisp.lisp;
   - ps: Invoke-WebRequest -UserAgent wget -Uri "https://superb-sea2.dl.sourceforge.net/project/sbcl/sbcl/1.4.2/sbcl-1.4.2-x86-windows-binary.msi" -OutFile sbcl.msi;
