@@ -5,7 +5,7 @@
   :author "Francis St-Amour"
   :licence "Public Domain"
   :depends-on (:redmoon :parachute)
-  :perform (asdf:test-op (op c) (uiop:symbol-call :redmoon.test :test-all))
+  :perform (asdf:test-op (op c) (uiop:symbol-call :redmoon.test :test-all t))
   :serial t
   :components ((:module tests
                 :components
