@@ -8,7 +8,7 @@ RUN curl -sOL https://beta.quicklisp.org/quicklisp.lisp
 # RUN curl -sOL https://beta.quicklisp.org/quicklisp.lisp.asc
 # RUN gpg --verify quicklisp.lisp.asc quicklisp.lisp
 RUN sbcl --noinform --non-interactive --load quicklisp.lisp --eval '(quicklisp-quickstart:install)'
-COPY docker/sbclrc /root/.sbclrc
+COPY ci/sbclrc /root/.sbclrc
 
 WORKDIR /root/quicklisp/local-projects/redmoon
 COPY . /root/quicklisp/local-projects/redmoon
