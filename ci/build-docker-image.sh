@@ -1,5 +1,7 @@
 #!/bin/sh
 
-docker build -t redmoon -f docker/Dockerfile .
+cd "$(git rev-parse --show-toplevel)"
+
+docker build -t redmoon -f ci/Dockerfile .
 
 
