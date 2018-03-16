@@ -1,18 +1,6 @@
 
 (in-package redmoon.type)
 
-(check (:name :integer!)
-  (results
-   (with-env (integer! 2 env constraint)) ;; FIXME it returns T instead of :integer
-   (with-env
-     (eval '(set x 42) env)
-     (integer! 'x env constraint))
-   (with-env
-     (eval '(set x true) env)
-     (integer! 'x env constraint))))
-
-;; (with-env (integer! x env constraint)) => Fails "Var X is unbound"
-
 
 (defparameter *forms*
   `(3

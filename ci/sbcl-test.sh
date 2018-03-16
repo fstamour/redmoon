@@ -2,7 +2,7 @@
 
 set -e
 
-redmoon_root=$(git rev-parse --show-toplevel)
+redmoon_root="$(git rev-parse --show-toplevel)"
 
 sbcl --noinform --non-interactive \
     --eval '(push "'"$redmoon_root"'" ql:*local-project-directories*)' \

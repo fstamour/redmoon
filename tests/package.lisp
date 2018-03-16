@@ -1,6 +1,6 @@
 (in-package :cl-user)
 
-(defpackage :redmoon.test
+(uiop:define-package :redmoon.test
   (:use :cl)
   (:import-from :parachute
                 :define-test
@@ -16,7 +16,11 @@
                 :exp)
   (:export
    :with-env
-   :test-all))
+   :test-all)
+  (:reexport
+   :parachute
+   :redmoon
+   :redmoon.user))
 
 (in-package redmoon.test)
 
@@ -34,19 +38,26 @@
 
 (defun test-all (&optional exit-p)
   (or
-   (test '(:redmoon.test :redmoon.test.core))
+   (test '(:redmoon.test
+           :redmoon.test.core
+           :redmoon.test.type))
    (exit -1 (not exit-p))))
 
-(defpackage :redmoon.test.core
+(uiop:define-package :redmoon.test.core
   (:use :cl :alexandria)
   (:shadowing-import-from :redmoon
-                          :eval
-                          :not :and :or)
+   :eval :not :and :or)
   (:use :redmoon)
   (:shadowing-import-from :parachute
-                          :true :false
-                          :of-type)
+   :true :false
+   :of-type)
   (:use :parachute)
   (:import-from :redmoon.test
-                :with-env))
+   :with-env)
+  (:reexport :cl :alexandria :redmoon :redmoon))
+
+(uiop:define-package :redmoon.test.type
+    (:mix
+     :redmoon.type :redmoon.test
+     :alexandria :cl))
 

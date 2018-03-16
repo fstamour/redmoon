@@ -74,8 +74,15 @@
                           integer?
                           bool?
                           function?)
-  (:export typeof
-           *top-level-constraint*))
+  (:export #:typeof
+           #:*top-level-constraint*
+           #:make-constraint
+           #:merge-constraint
+           #:add-constraint
+           #:integer!
+           #:integer*
+           #:bool!
+           #:bool*))
 
 (defpackage redmoon.user
   (:use redmoon)

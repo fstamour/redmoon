@@ -34,9 +34,8 @@
      (setf (gethash ',name *constraint*) ',body)
      (defun ,(symbolicate name '!) (form env constraint)
        (if (,(symbolicate name '?) form)
-           t
+           ,(make-keyword name)
            (if (var? form)
-               ;; TODO Check if value of var (in env) passes the constraints.
                (add-constraint form ,(make-keyword name) constraint)
                (typeof form env constraint))))
      (defun ,(symbolicate name '*) (form env constraint)
