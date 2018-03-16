@@ -8,7 +8,9 @@
        ,@(butlast body)
        ;; (break)
        ,(append (first (last (last body)))
-                '(redmoon:*top-level-environment* *top-level-constraint*)))))
+                '(redmoon:*top-level-environment* *top-level-constraint*))))
+  (defmacro check-constraint (var type &body body)
+    `(is eq ,type (with-env ,@body (get-constraint ,var *top-level-constraint*)))))
 
 (define-test integer!
   (is eq :integer
@@ -31,11 +33,24 @@
         (bool! 'x))))
 
 (define-test modulo
-  (is eq :integer (with-env
-                    (typeof '(mod n 2))
-                    (get-constraint 'n *top-level-constraint*)))
-  (with-env
-    (integer? '(mod n 2))))
+  (check-constraint 'n :integer (typeof '(mod n 2)))
+  (false (with-env
+           (integer? '(mod n 2)))))
 
+
+(define-test comparison
+  (is eq :bool (with-env (typeof '(< 1 0))))
+  (is eq :bool (with-env (typeof '(> 1 0))))
+  (is eq :bool (with-env (typeof '(= 1 0))))
+  (is eq :bool (with-env (typeof '(/= 1 0))))
+  (is eq :bool (with-env (typeof '(<= 1 0))))
+  (is eq :bool (with-env (typeof '(>= 1 0))))
+
+  (check-constraint 'n :integer (typeof '(< n 0)))
+  (check-constraint 'n :integer (typeof '(> n 0)))
+  (check-constraint 'n :integer (typeof '(= n 0)))
+  (check-constraint 'n :integer (typeof '(/= n 0)))
+  (check-constraint 'n :integer (typeof '(<= n 0)))
+  (check-constraint 'n :integer (typeof '(>= n 0))))
 
 

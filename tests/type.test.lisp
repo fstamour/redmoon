@@ -73,11 +73,6 @@
 
 ;; (typeof-test *forms*)
 
-
-(check (:name :comparison)
-  (with-env
-    (typeof '(< 1 0) env constraint)))
-
 (check (:name :if)
   (typeof-test
    (remove-if-not #'(lambda (x) (and (listp x)

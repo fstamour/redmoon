@@ -104,7 +104,8 @@
 ;;; Arithmetic
          ((+ - * / mod) (integer* (rest form) env constraint))
 ;;; Comparison
-         ((< > =) (let ((it (integer* (rest form) env constraint)))
+         ((< > = /= <= >=)
+          (let ((it (integer* (rest form) env constraint)))
                     (if (eq it :integer)
                         :bool
                         it)))

@@ -50,7 +50,7 @@
 
 ;;; Value Types
 
-(defun integer? (form) 
+(defun integer? (form)
   (integerp form))
 
 (defun bool? (form)

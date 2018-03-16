@@ -23,7 +23,7 @@
 
    ;; keywords
    true false
-   + - * / mod < > =
+   + - * / mod =/= < > <= >=
    not and or
    set
    while
