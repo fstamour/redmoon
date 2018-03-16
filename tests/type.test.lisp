@@ -73,40 +73,4 @@
 
 ;; (typeof-test *forms*)
 
-(check (:name :if)
-  (typeof-test
-   (remove-if-not #'(lambda (x) (and (listp x)
-                                     (eq 'if (first x))))
-                  *forms*)))
 
-(check (:name :function-type)
-  (results
-   (typeof 'redmoon.user::oddp)
-   (typeof 'redmoon.user::pairp)))
-
-(typeof 'redmoon.user::exp)
-
-(defmacro with-oddp-pairp (&body body)
-  `(with-env
-     (def oddp (n)
-       (not (= 0 (mod n 2))))
-     (def pairp (n)
-       (not (oddp n)))
-     (def pairp* (n)
-       (= 0 (mod n 2)))
-     ,@body))
-
-(with-oddp-pairp
-  (typeof 'oddp))
-
-(with-oddp-pairp
-  (typeof '(oddp n)))
-
-(with-oddp-pairp
-  (typeof-funcall '(oddp n) env constraint))
-
-(with-oddp-pairp
-  (typeof '(oddp n)))
-
-
-(typeof 'redmoon.user::exp)
