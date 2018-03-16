@@ -30,3 +30,12 @@
         (add-constraint 'x :integer *top-level-constraint*)
         (bool! 'x))))
 
+(define-test modulo
+  (is eq :integer (with-env
+                    (typeof '(mod n 2))
+                    (get-constraint 'n *top-level-constraint*)))
+  (with-env
+    (integer? '(mod n 2))))
+
+
+

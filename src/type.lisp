@@ -89,7 +89,7 @@
     (error "Invalid form 'NIL'"))
   (or
    (if (atom? form)
-       ;; Atom
+;;; Atom
        (typeof-atom form env constraint)
        (case (car form)
 ;;; Statements

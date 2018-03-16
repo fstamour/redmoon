@@ -34,7 +34,7 @@
    make-env
    copy-env
    *top-level-environment*
-   make-constraint
+   make-constraint-set
    *top-level-constraint*
 
    ;; Predicates
@@ -76,11 +76,14 @@
                           function?)
   (:export #:typeof
            #:*top-level-constraint*
-           #:make-constraint
+           #:make-constraint-set
            #:merge-constraint
+           #:get-constraint
            #:add-constraint
+           #:integer?
            #:integer!
            #:integer*
+           #:bool?
            #:bool!
            #:bool*))
 

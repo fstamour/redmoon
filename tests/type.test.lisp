@@ -73,18 +73,6 @@
 
 ;; (typeof-test *forms*)
 
-(check (:name :mod)
-  (results
-   (with-env
-     (def n 0)
-     (typeof '(mod n 2)))
-   (with-env
-     (def n 0)
-     #+nil (integer! '(mod n 2) env constraint)
-     #+nil (integer* '(mod n 2) env constraint)
-     (integer? '(mod n 2))) ;; FIXME This returns nil, should return :integer, (n :integer)
-   ))
-
 
 (check (:name :comparison)
   (with-env
