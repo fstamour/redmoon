@@ -13,15 +13,20 @@
 (define-test integer!
   (is eq :integer
       (with-env* (integer! 2)))
-  (is eq :integer
+  (false
       (with-env*
-        (redmoon:eval '(set x 42))
-        (integer! 'x)))
-  (is eq :integer
-      (with-env*
-        (redmoon:eval '(set x true))
+        (add-constraint 'x :bool *top-level-constraint*)
         (integer! 'x)))
   (is eq :integer
       (with-env*
         (integer! 'x))))
+
+(define-test bool!
+  (is eq :bool (with-env* (bool! 'true)))
+  (is eq :bool (with-env* (bool! 'false)))
+  (is eq :integer (with-env* (bool! 42))) ;; That's not confusing at all. 
+  (false
+      (with-env*
+        (add-constraint 'x :integer *top-level-constraint*)
+        (bool! 'x))))
 
