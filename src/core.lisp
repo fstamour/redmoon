@@ -159,7 +159,7 @@
 
 (defun eval-not (form env)
   "Eval a form '(not ...)'"
-  ;; TODO Check lenght = 2
+  ;; TODO Check length = 2
   (ecase (eval (second form) env)
     (:true :false)
     (:false :true)))
