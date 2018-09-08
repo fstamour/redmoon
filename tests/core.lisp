@@ -1,108 +1,186 @@
-
-(in-package #:redmoon.test)
+(in-package #:redmoon.test.core)
 
 (define-test keyword?
-  (false (redmoon:keyword? :x))
-  (false (redmoon:keyword? 'x))
-
-  (true (redmoon:keyword? :if))
-  (true (redmoon:keyword? :set))
-  (true (redmoon:keyword? :while))
-  (true (redmoon:keyword? :+))
-  (true (redmoon:keyword? :-))
-  (true (redmoon:keyword? :*))
-  (true (redmoon:keyword? :/))
-  (true (redmoon:keyword? :=))
-  (true (redmoon:keyword? :/=))
-  (true (redmoon:keyword? :<))
-  (true (redmoon:keyword? :>))
-  (true (redmoon:keyword? :<=))
-  (true (redmoon:keyword? :>=))
-  (true (redmoon:keyword? :true))
-  (true (redmoon:keyword? :false))
-
-  (true (redmoon:keyword? 'if))
-  (true (redmoon:keyword? 'set))
-  (true (redmoon:keyword? 'while))
-  (true (redmoon:keyword? '+))
-  (true (redmoon:keyword? '-))
-  (true (redmoon:keyword? '*))
-  (true (redmoon:keyword? '/))
-  (true (redmoon:keyword? '=))
-  (true (redmoon:keyword? '/=))
-  (true (redmoon:keyword? '<))
-  (true (redmoon:keyword? '>))
-  (true (redmoon:keyword? '<=))
-  (true (redmoon:keyword? '>=))
-  (true (redmoon:keyword? 'true))
-  (true (redmoon:keyword? 'false)))
-
+  (false (keyword? :x))
+  (false (keyword? 'x))
+  (true (keyword? :if))
+  (true (keyword? :set))
+  (true (keyword? :while))
+  (true (keyword? :+))
+  (true (keyword? :-))
+  (true (keyword? :*))
+  (true (keyword? :/))
+  (true (keyword? :=))
+  (true (keyword? :/=))
+  (true (keyword? :<))
+  (true (keyword? :>))
+  (true (keyword? :<=))
+  (true (keyword? :>=))
+  (true (keyword? :true))
+  (true (keyword? :false))
+  (true (keyword? 'if))
+  (true (keyword? 'set))
+  (true (keyword? 'while))
+  (true (keyword? '+))
+  (true (keyword? '-))
+  (true (keyword? '*))
+  (true (keyword? '/))
+  (true (keyword? '=))
+  (true (keyword? '/=))
+  (true (keyword? '<))
+  (true (keyword? '>))
+  (true (keyword? '<=))
+  (true (keyword? '>=))
+  (true (keyword? 'true))
+  (true (keyword? 'false)))
 
 (define-test var?
   :depends-on (keyword?)
-  (true (redmoon:var? 'x)))
+  (true (var? 'x))
+  (false (var? 'true))
+  (false (var? 'false))
+  (false (var? 'if))
+  (false (var? '(any thing)))
+  (false (var? 'while)))
 
 (define-test assignation?
-  (true (redmoon:assignation? '(set x 42)))
-  (true (redmoon:assignation? '(set x 42 y 24)))
-  (false (redmoon:assignation? '(set x 42 y)))
-  (false (redmoon:assignation? '(not-set bla bla)))
-  (false (redmoon:assignation? 'not-even-a-list)))
+  (true (assignation? '(set x 42)))
+  (true (assignation? '(set x 42 y 24)))
+  (false (assignation? '(set x 42 y)))
+  (false (assignation? '(not-set bla bla)))
+  (false (assignation? 'not-even-a-list)))
 
 ;; TODO Strings and arrays
 (define-test atom?
-  (true (redmoon:atom? 42))
-  (true (redmoon:atom? 42.5))
-  (true (redmoon:atom? 'symbol))
-  (true (redmoon:atom? :keyword))
-  (false (redmoon:atom? '(some list))))
+  (true (atom? 42))
+  (true (atom? 42.5))
+  (true (atom? 'symbol))
+  (true (atom? 'true))
+  (true (atom? 'false))
+  (true (atom? :keyword))
+  (false (atom? '()))
+  (false (atom? '(some list))))
 
 (define-test integer?
-  (true (redmoon:integer? 42))
-  (false (redmoon:integer? 42.5))
-  (false (redmoon:integer? 'symbol))
-  (false (redmoon:integer? :keyword))
-  (false (redmoon:integer? '(some list))))
+  (true (integer? 42))
+  (false (integer? 42.5))
+  (false (integer? 'symbol))
+  (false (integer? :keyword))
+  (false (integer? '(some list))))
 
 (define-test bool?
-  (true (redmoon:bool? :true))
-  (true (redmoon:bool? :false))
-  (false (redmoon:bool? cl:t))
-  (false (redmoon:bool? cl:nil))
-  (false (redmoon:bool? 42)))
-
+  (true (bool? :true))
+  (true (bool? :false))
+  (false (bool? t))
+  (false (bool? nil))
+  (false (bool? 42)))
 
 (define-test function?
-  (false (redmoon:function? '(set x 42)))
-  (false (redmoon:function? '(set x 42 y 24)))
-  ;; (false (redmoon:function? '(set x 42 y)))
-  (false (redmoon:function? 42))
-  (false (redmoon:function? 42.5))
-  (false (redmoon:function? 'symbol))
-  (false (redmoon:function? :keyword))
-  (false (redmoon:function? 'not-even-a-list))
-  (true (redmoon:function? '(this is ok))))
+  (false (function? '(set x 42)))
+  (false (function? '(set x 42 y 24)))
+  ;; (false (function? '(set x 42 y)))
+  (false (function? 42))
+  (false (function? 42.5))
+  (false (function? 'symbol))
+  (false (function? :keyword))
+  (false (function? 'not-even-a-list))
+  (true (function? '(this is ok))))
 
 (define-test to-bool
-  (is eq :true (redmoon:to-bool cl:t))
-  (is eq :true (redmoon:to-bool 42))
-  (is eq :false (redmoon:to-bool cl:nil)))
+  (is eq :true (to-bool t))
+  (is eq :true (to-bool 42))
+  (is eq :false (to-bool nil)))
 
 (define-test truep
-  (true (redmoon:truep :true))
-  (false (redmoon:truep :false))
+  (true (truep 'true))
+  (false (truep 'false))
+  (true (truep :true))
+  (false (truep :false))
   ;; Anything else should signal an error.
-  (fail (redmoon:truep 42)))
+  (fail (truep 42)))
 
 (define-test eval-atom
-  (is eq 42 (redmoon:eval-atom 42))
-  (fail (redmoon:eval-atom 42.5))
-  (is eq :true (redmoon:eval-atom :true))
-  (is eq :false (redmoon:eval-atom :false))
-  (fail (redmoon:eval-atom 'x))
-  ;; TODO This fails saying the variable x doesn't exists
-  #+nil
-  (fail (let ((env (redmoon:make-env)))
-          (redmoon:eval-set '(set 'x 42) env)
-          (redmoon:eval-atom 'x env))))
+  (is = 42 (eval-atom 42))
+  (fail (eval-atom 42.5))
+  (is eq :true (eval-atom :true))
+  (is eq :false (eval-atom :false))
+  (fail (eval-atom 'x))
+  (is = 42 (eval-atom 'x (make-env '(x 42))))
+  (is = 42
+      (with-env
+        (eval-set '(set x 42) *top-level-environment*)
+        (eval-atom 'x *top-level-environment*))))
+
+(define-test eval/atom
+  (is = 1 (eval 1))
+  (is eq :false (eval :false))
+  (is = 42 (eval 'x (make-env '(x 42)))))
+
+(define-test eval/sequence
+  (is = 4 (eval '(2 3 4)))
+  (is = 3 (eval '((+ 1 2))))
+  (is = 4 (eval '((+ x 2)) (make-env '(x 2)))))
+
+(define-test not
+  (is eq :false (eval-not '(not :true) (make-env)))
+  (is eq :true (eval-not '(not :false) (make-env)))
+  (is eq :true (eval-not '(not x) (make-env '(x :false)))))
+
+(defun truth-table (op n)
+  (apply #'map-product
+         (lambda (&rest b) `(,op ,@b))
+         (loop :for i :below n :collect '(true false))))
+
+(define-test or
+  (is equal '(:true :true :true :false)
+      (mapcar 'eval (truth-table 'or 2))))
+
+(define-test and
+  (is equal '(:false :false :false :true)
+      (mapcar 'eval (truth-table 'and 2))))
+
+(define-test +
+  (is = 3 (eval '(+ 1 2)))
+  (is = 1 (eval '(+ x 1) (make-env '(x 0)))))
+
+(define-test -
+  (is = 0 (eval '(- 1 1)))
+  (is = -1 (eval '(- x 1) (make-env '(x 0)))))
+
+(define-test *
+  (is = 4 (eval '(* 2 2)))
+  (is = 0 (eval '(* x 1) (make-env '(x 0)))))
+
+;; integer division
+(define-test /
+  (is = 3 (eval '(/ 10 3)))
+  (is = 0 (eval '(/ x 5) (make-env '(x 2)))))
+
+(define-test mod
+  (is = 0 (eval '(mod 10 2)))
+  (is = 2 (eval '(mod 11 3))))
+
+(define-test comparison
+  (is eq :true (eval '(< x 1) (make-env '(x 0))))
+  (is eq :false (eval '(> x 1) (make-env '(x 0))))
+  (is eq :false (eval '(= x 1) (make-env '(x 0))))
+  (is eq :true (eval '(= x 1) (make-env '(x 1))))
+  (is eq :false (eval '(= 1 2)))
+  (is eq :true (eval '(= 1 1 1 1))))
+
+(define-test eval-if
+  (is = 42 (eval-if '(if true 42 -1)))
+  (is = -1 (eval-if '(if false 42 -1)))
+  (is = -1 (eval-if '(if (< 1 0) 42 -1))))
+
+(define-test loop
+  (is = 0
+      (eval '((while (> i 0)
+               (set i (- i 1)))
+              i)
+            (make-env '(i 5)))))
+
+#+nil
+(eval '(def x (a) ((set a (+ 1 a))
+                   (* a 2))) env)
 

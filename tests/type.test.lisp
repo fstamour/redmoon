@@ -1,28 +1,6 @@
 
 (in-package redmoon.type)
 
-(defmacro with-env (&body body)
-  "Return X, env, constraint"
-  `(let* ((env (make-env))
-          (constraint (make-constraint))
-          (*top-level-environment* env)
-          (*top-level-constraint* constraint))
-     (values (progn ,@body)
-             ;; (hash-table-plist env) ;; These test sould not change the environment.
-             (hash-table-plist constraint))))
-
-(check (:name :integer!)
-  (results
-   (with-env (integer! 2 env constraint)) ;; FIXME it returns T instead of :integer
-   (with-env
-     (eval '(set x 42) env)
-     (integer! 'x env constraint))
-   (with-env
-     (eval '(set x true) env)
-     (integer! 'x env constraint))))
-
-;; (with-env (integer! x env constraint)) => Fails "Var X is unbound"
-
 
 (defparameter *forms*
   `(3
@@ -95,57 +73,4 @@
 
 ;; (typeof-test *forms*)
 
-(check (:name :mod)
-  (results
-   (with-env
-     (def n 0)
-     (typeof '(mod n 2)))
-   (with-env
-     (def n 0)
-     #+nil (integer! '(mod n 2) env constraint)
-     #+nil (integer* '(mod n 2) env constraint)
-     (integer? '(mod n 2))) ;; FIXME This returns nil, should return :integer, (n :integer)
-   ))
 
-
-(check (:name :comparison)
-  (with-env
-    (typeof '(< 1 0) env constraint)))
-
-(check (:name :if)
-  (typeof-test
-   (remove-if-not #'(lambda (x) (and (listp x)
-                                     (eq 'if (first x))))
-                  *forms*)))
-
-(check (:name :function-type)
-  (results
-   (typeof 'redmoon.user::oddp)
-   (typeof 'redmoon.user::pairp)))
-
-(typeof 'redmoon.user::exp)
-
-(defmacro with-oddp-pairp (&body body)
-  `(with-env
-     (def oddp (n)
-       (not (= 0 (mod n 2))))
-     (def pairp (n)
-       (not (oddp n)))
-     (def pairp* (n)
-       (= 0 (mod n 2)))
-     ,@body))
-
-(with-oddp-pairp
-  (typeof 'oddp))
-
-(with-oddp-pairp
-  (typeof '(oddp n)))
-
-(with-oddp-pairp
-  (typeof-funcall '(oddp n) env constraint))
-
-(with-oddp-pairp
-  (typeof '(oddp n)))
-
-
-(typeof 'redmoon.user::exp)

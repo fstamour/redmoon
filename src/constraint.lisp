@@ -1,12 +1,12 @@
 
 (in-package redmoon.type)
 
-(defun make-constraint ()
+(defun make-constraint-set ()
   "Create an object to hold a collection of constraints."
   (make-hash-table))
 
 (defparameter *top-level-constraint*
-  (make-constraint)
+  (make-constraint-set)
   "Top level constraints")
 
 ;; TODO Add tests for merge-constraint
@@ -18,6 +18,8 @@
 
 (defmethod merge-constraint (c1 (c2 (eql :var))) c1)
 
+(defun get-constraint (var constraint)
+  (gethash var constraint))
 
 (defun add-constraint% (var type constraint)
   (setf (gethash var constraint) type))
@@ -34,9 +36,8 @@
      (setf (gethash ',name *constraint*) ',body)
      (defun ,(symbolicate name '!) (form env constraint)
        (if (,(symbolicate name '?) form)
-           t
+           ,(make-keyword name)
            (if (var? form)
-               ;; TODO Check if value of var (in env) passes the constraints.
                (add-constraint form ,(make-keyword name) constraint)
                (typeof form env constraint))))
      (defun ,(symbolicate name '*) (form env constraint)

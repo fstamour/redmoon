@@ -1,4 +1,4 @@
-(cl:in-package :redmoon.test)
+(in-package :redmoon.test)
 
 (define-test odd
   :serial nil
@@ -17,11 +17,11 @@
   (is equal '(:function :integer :bool) (type:typeof 'oddp))
   (is equal '(:function :integer :bool) (type:typeof 'pairp))
   (is eq :bool (type:typeof '(oddp 2)))
-  (is eq :bool (type:typeof '(oddp n) redmoon:*top-level-environment* (type::make-constraint))))
+  (is eq :bool (type:typeof '(oddp n) redmoon:*top-level-environment* (type::make-constraint-set))))
 
-;; TODO Don't mutate *top-level-environment*
 (define-test def
   (is = 4
-      (def f (x) (+ x 2))
-      (run (f 2))))
+      (with-env
+        (def f (x) (+ x 2))
+        (run (f 2)))))
 

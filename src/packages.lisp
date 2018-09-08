@@ -23,7 +23,7 @@
 
    ;; keywords
    true false
-   + - * / mod < > =
+   + - * / mod = /= < > <= >=
    not and or
    set
    while
@@ -34,6 +34,7 @@
    make-env
    copy-env
    *top-level-environment*
+   make-constraint-set
    *top-level-constraint*
 
    ;; Predicates
@@ -54,7 +55,8 @@
    eval-or
    eval-and
    eval-seq
-   eval-funcall)
+   eval-funcall
+   eval-def)
   (:shadow eval))
 
 (defpackage :redmoon.type
@@ -72,14 +74,26 @@
                           integer?
                           bool?
                           function?)
-  (:export typeof
-           *top-level-constraint*))
+  (:export #:typeof
+           #:*top-level-constraint*
+           #:make-constraint-set
+           #:merge-constraint
+           #:get-constraint
+           #:add-constraint
+           #:integer?
+           #:integer!
+           #:integer*
+           #:bool?
+           #:bool!
+           #:bool*))
 
 (defpackage redmoon.user
   (:use redmoon)
   (:import-from redmoon
                 def
                 run)
+  (:import-from redmoon.type
+                typeof)
   (:export oddp pairp
            exp))
 
