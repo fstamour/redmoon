@@ -89,7 +89,7 @@
     (error "Invalid form 'NIL'"))
   (or
    (if (atom? form)
-       ;; Atom
+;;; Atom
        (typeof-atom form env constraint)
        (case (car form)
 ;;; Statements
@@ -104,7 +104,8 @@
 ;;; Arithmetic
          ((+ - * / mod) (integer* (rest form) env constraint))
 ;;; Comparison
-         ((< > =) (let ((it (integer* (rest form) env constraint)))
+         ((< > = /= <= >=)
+          (let ((it (integer* (rest form) env constraint)))
                     (if (eq it :integer)
                         :bool
                         it)))

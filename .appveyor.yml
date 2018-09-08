@@ -23,7 +23,7 @@ install:
   - ps: start-sleep -s 500
   - ps: cat sbcl-intall.log
   - cmd: '"C:\Program Files\Steel Bank Common Lisp\1.4.2\sbcl" --noinform --non-interactive --load %CACHE%\quicklisp.lisp --eval "(quicklisp-quickstart:install)"'
-  - ps: copy-item docker/sbclrc -destination $HOME/.sbclrc
+  - ps: copy-item ci/sbclrc -destination $HOME/.sbclrc
   - ps: add-content -path $HOME/.sbclrc -value '(push "c:/projects/redmoon/" asdf:*central-registry*)'
   - ps: cat $HOME/.sbclrc
   - cmd: '"C:\Program Files\Steel Bank Common Lisp\1.4.2\sbcl" --noinform --non-interactive --eval "(ql:quickload :redmoon.test)" --eval "(asdf:test-system :redmoon)"'

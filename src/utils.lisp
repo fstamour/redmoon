@@ -21,6 +21,7 @@
          (unless (null (cdr ,iterator)) ,body-butlast)))))
 
 
+#+nil
 (check (:name :dolist-butlast
         :output-p t)
   (let ((list (loop :for i :below 15 :collect i)))
