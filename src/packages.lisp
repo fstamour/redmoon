@@ -1,3 +1,4 @@
+(in-package :cl-user)
 
 (defpackage redmoon.utils
   (:use cl
@@ -23,7 +24,7 @@
 
    ;; keywords
    true false
-   + - * / mod =/= < > <= >=
+   + - * / mod = /= < > <= >=
    not and or
    set
    while
@@ -57,7 +58,7 @@
    eval-seq
    eval-funcall
    eval-def)
-  (:shadow eval))
+  (:shadow eval inspect))
 
 (defpackage :redmoon.type
   (:nicknames type)
@@ -91,7 +92,8 @@
   (:use redmoon)
   (:import-from redmoon
                 def
-                run)
+                run
+                inspect)
   (:import-from redmoon.type
                 typeof)
   (:export oddp pairp
