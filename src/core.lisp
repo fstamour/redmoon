@@ -205,38 +205,52 @@
                   new-env)))))
 
 
-(defparameter *eval-depth* 0)
-(defun eval (form &optional (env (make-env)))
-  (unless form
-    (error "Invalid form 'NIL'"))
-  (let ((*eval-depth* (1+ *eval-depth*)))
-    (if (< 100 *eval-depth*) (error "Max eval depth exceeded."))
-    (if (atom? form)
+(defun eval-arithmetic-and-comparison (form environment)
+  (let ((result (apply (symbol-function (car form))
+                       (map-eval (rest form) environment))))
+    (if (numberp result)
+        (nth-value 0 (floor result))
+        (to-bool result))))
+
+(redmoon.core.macros:define-processor
+    eval
+  :optional-environment-p t
+  :group-arithmetic-and-comparison t
+  :max-depth 100)
+
+#+nil (progn
+        (defparameter *eval-depth* 0)
+        (defun eval (form &optional (env (make-env)))
+          (unless form
+            (error "Invalid form 'NIL'"))
+          (let ((*eval-depth* (1+ *eval-depth*)))
+            (if (< 100 *eval-depth*) (error "Max eval depth exceeded."))
+            (if (atom? form)
 ;;; Atom
-        (eval-atom form env)
-        (case (car form)
+                (eval-atom form env)
+                (case (car form)
 ;;; Statements
-          (set (eval-set form env))
-          (while (eval-while form env))
-          (if (eval-if form env))
+                  (set (eval-set form env))
+                  (while (eval-while form env))
+                  (if (eval-if form env))
 ;;; Boolean operators
-          (not (eval-not form env))
-          (or (eval-or form env))
-          (and (eval-and form env))
+                  (not (eval-not form env))
+                  (or (eval-or form env))
+                  (and (eval-and form env))
 ;;; Arithmetic and comparison
-          ((+ - * / mod = /= < > <= >=)
-           (let ((result (apply (symbol-function (car form))
-                                (map-eval (rest form) env))))
-             (if (numberp result)
-                 (nth-value 0 (floor result))
-                 (to-bool result))))
+                  ((+ - * / mod = /= < > <= >=)
+                   (let ((result (apply (symbol-function (car form))
+                                        (map-eval (rest form) env))))
+                     (if (numberp result)
+                         (nth-value 0 (floor result))
+                         (to-bool result))))
 ;;; Definition
-          (def (eval-def form env))
-          (t
-           (if (var? (car form))
+                  (def (eval-def form env))
+                  (t
+                   (if (var? (car form))
 ;;; Function call
-               (eval-funcall form env)
+                       (eval-funcall form env)
 ;;; Sequence
-               (eval-seq form env)))))))
+                       (eval-seq form env))))))))
 
 

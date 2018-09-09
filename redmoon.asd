@@ -9,13 +9,14 @@
   :components
   ((:module src
     :components
-            ((:file packages)
-             (:file utils :depends-on (packages))
-             (:file core :depends-on (packages utils))
-             (:file top-level :depends-on (core))
-             (:file constraint :depends-on (packages))
-             (:file type :depends-on (constraint))))
+    ((:file packages)
+     (:file utils :depends-on (packages))
+     (:file language-processor)
+     (:file core :depends-on (packages utils language-processor))
+     (:file top-level :depends-on (core))
+     (:file constraint :depends-on (packages))
+     (:file type :depends-on (constraint))))
    (:module lib
     :components
-            ((:file oddp+pairp)
-             (:file exponential)))))
+    ((:file oddp+pairp)
+     (:file exponential)))))
