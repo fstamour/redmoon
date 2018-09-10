@@ -13,12 +13,12 @@
 
 (defun typeof-atom (atom env constraint)
   (cond
-    ((bool? atom) :bool)
-    ((integer? atom) :integer)
-    ((var? atom) (if (function? (get-var atom env nil))
-                     (typeof-function atom env constraint)
-                     :var))
-    ((keyword? atom) :keyword)))
+   ((bool? atom) :bool)
+   ((integer? atom) :integer)
+   ((var? atom) (if (function? (get-var atom env nil))
+                    (typeof-function atom env constraint)
+                  (or (get-constraint atom constraint) :var)))
+   ((keyword? atom) :keyword)))
 
 ;; FIXME Arg... We should differentiate if-statements from if-expressions
 ;; In if-statement we don't care that the then-form as a different type
@@ -49,17 +49,23 @@
         (make-type-error "Malformed if (the condition is not a boolean expression): ~S"
                          form))))
 
+(defun typeof-statement (form env constraint)
+  (dolist-butlast (f form)
+                  (typeof f env constraint nil)
+                  (typeof f env constraint t)))
+
 (defun typeof-function (name env constraint)
   (let ((definition (get-var name env))
         (new-constraint (copy-hash-table constraint)))
     (destructuring-bind (arguments &body body)
         definition
-      (typeof body env new-constraint)  ; Called for side-effects
+      ;; body
+      (typeof-statement body env new-constraint) ; Called for side-effects
       (let* ((arguments-types
-               (loop :for arg :in arguments :collect (gethash arg new-constraint)))
+              ;; arguments
+              (loop :for arg :in arguments :collect (gethash arg new-constraint)))
              (return-type
-               (typeof (last body) env new-constraint)))
-        ;; (foreach argument) get type from new-constraint
+              (typeof (lastcar body) env new-constraint)))
         `(:function ,@arguments-types ,return-type)))))
 
 (defun typeof-funcall (form env constraint)
@@ -81,45 +87,54 @@
     ;; The type of the function call is the return type of the function.
     (third typeof-function)))
 
+(defun typeof-assignement (form env constraint)
+  (loop :for (var value) :on (rest form) :by #'cddr
+        :for type = (typeof value env constraint)
+        :do (add-constraint var type constraint)
+        :finally (return type)))
+
+(defun typeof-while-statement (form env constraint)
+  ;; TODO
+  ;; Write tests first
+  ;; condition then body
+  :while-statement)
+
 (defun typeof (form  &optional
-                       (env redmoon::*top-level-environment*)
-                       (constraint *top-level-constraint*)
-                       (expression-p t))
+                     (env redmoon::*top-level-environment*)
+                     (constraint *top-level-constraint*)
+                     (expression-p t))
   (unless form
     (error "Invalid form 'NIL'"))
   (or
    (if (atom? form)
 ;;; Atom
        (typeof-atom form env constraint)
-       (case (car form)
+     (case (car form)
 ;;; Statements
-         (set :set-statement)     ;; TODO
-         (while :while-statement) ;; TODO
-         (if (if expression-p
-                 (typeof-if-expression form env constraint)
-                 (typeof-if-statement form env constraint)))
+       (set (typeof-assignement form env constraint))
+       (while (typeof-while-statement form env constraint))
+       (if (if expression-p
+               (typeof-if-expression form env constraint)
+             (typeof-if-statement form env constraint)))
 ;;; Boolean operators
-         (not (bool! (second form) env constraint))
-         ((or and) (bool* (rest form) env constraint))
+       (not (bool! (second form) env constraint))
+       ((or and) (bool* (rest form) env constraint))
 ;;; Arithmetic
-         ((+ - * / mod) (integer* (rest form) env constraint))
+       ((+ - * / mod) (integer* (rest form) env constraint))
 ;;; Comparison
-         ((< > = /= <= >=)
-          (let ((it (integer* (rest form) env constraint)))
-                    (if (eq it :integer)
-                        :bool
-                        it)))
+       ((< > = /= <= >=)
+        (let ((it (integer* (rest form) env constraint)))
+          (if (eq it :integer)
+              :bool
+            it)))
 ;;; Definition
-         (def :def-statement)
-         (t
-          (if (var? (car form))
+       (def :def-statement)
+       (t
+        (if (and (var? (car form))
+                 (function? (get-var (car form) env))
+                 (not (primitive? (car form))))
 ;;; Function call
-              (typeof-funcall form env constraint)
+            (typeof-funcall form env constraint)
 ;;; Sequence
-              (dolist-butlast (f form)
-                              (typeof f env constraint nil)
-                              (typeof f env constraint))
-              #+nil(loop :for f :in form
-                    :for x = 
-                    :return x)))))
+          (typeof-statement form env constraint)))))
    (error "Typeof of ~S is nil (this is a bug)." form)))

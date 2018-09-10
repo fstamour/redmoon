@@ -5,7 +5,7 @@
 ;; TODO [Square] root
 
 (parachute:test 'odd)
-(parachute:test 'pairp)
+(parachute:test 'evenp)
 (parachute:test 'typeof)
 (parachute:test 'def)
 

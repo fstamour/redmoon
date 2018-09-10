@@ -10,9 +10,9 @@ CryptoHash that.
 Given
 	(def oddp (x) (not (= 0 (mod x 2))))
 Can we make
-	(def pairp (x) (not (oddp x)))
+	(def evenp (x) (not (oddp x)))
 have the same identity than 
-	(def pairp (x) (not (= 0 (mod x 2))))
+	(def evenp (x) (not (= 0 (mod x 2))))
 ?
 
 Integer square root
@@ -74,12 +74,12 @@ Some optimizations
 	 y 0)
 (while (> x 0)
 	(set x (- x 2))
-	(if (pairp x)
+	(if (evenp x)
 		(set y (+ y 1))
 		(set y (- y 1))))
 
-(pairp (a) (= 0 (mod a 2)))
-(mod a n) == (mod (+/- a n) n) && (set x (- x 2)) ==> (pairp x) is "constant"!
+(evenp (a) (= 0 (mod a 2)))
+(mod a n) == (mod (+/- a n) n) && (set x (- x 2)) ==> (evenp x) is "constant"!
 	"What changes to a parameter makes a function <<invariant>>?"
 
 ==> if's condition is always true		

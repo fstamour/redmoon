@@ -40,7 +40,7 @@
 
    ;; Predicates
    assignation? atom? keyword? var?
-   bool? integer? function?
+   bool? integer? primitive? function?
 
    ;; Host-guest type conversions
    to-bool
@@ -96,7 +96,5 @@
                 inspect)
   (:import-from redmoon.type
                 typeof)
-  (:export oddp pairp
+  (:export oddp evenp
            exp))
-
-

@@ -1,5 +1,5 @@
 
-(in-package redmoon.type)
+(in-package #:redmoon.type)
 
 (defun make-constraint-set ()
   "Create an object to hold a collection of constraints."
@@ -32,6 +32,9 @@
 
 (defparameter *constraint* (make-hash-table))
 (defmacro defconstraint (name &body body)
+  "Defines 2 function <name>! and <name>* and register the name in *constraint*.
+Each of these functions needs the environment because they can call typeof.
+And typeof needs the environment to get the function definitions."
   `(progn
      (setf (gethash ',name *constraint*) ',body)
      (defun ,(symbolicate name '!) (form env constraint)
@@ -51,4 +54,3 @@
 (defconstraint integer)
 
 (defconstraint bool)
-
