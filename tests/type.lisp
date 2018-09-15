@@ -62,10 +62,16 @@
   (is-type :bool (typeof '(or true false)))
   (check-constraint 'a :bool (typeof '(or a true))))
 
-;; TODO Use check-constraint macro
 (define-test assignement
   (is-type :integer (typeof '(set x 2)))
   (is-type :bool (typeof '(set x :true)))
-  (is-type :bool (typeof '((set x :true) x))))
+  (is-type :bool (typeof '((set x :true) x)))
+  (check-constraint 'x (:alias a) (typeof '(set x a)))
+  (check-constraint 'x :integer (typeof '((set x a) (= x 0))))
+  (check-constraint 'x :bool (typeof '((set x a) (not x)))))
 
-;; TODO define-test while
+(define-test while-statement
+  (is-type :bool (typeof '(while :true :true)))
+  (is-type :bool (typeof '(while :false :false)))
+  (is-type :integer (typeof '(while :true 1)))
+  (is-type :integer (typeof '(while :false 1))))

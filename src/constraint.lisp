@@ -9,14 +9,15 @@
   (make-constraint-set)
   "Top level constraints")
 
-;; TODO Add tests for merge-constraint
-(defgeneric merge-constraint (c1 c2))
+(defun alias? (constraint)
+  (and (listp constraint)
+       (eq :alias (first constraint))))
 
-(defmethod merge-constraint (c1 c2)
-  (when (equalp c1 c2) c1)
-  #+nil (error "Don't know how to merge c1 and c2."))
-
-(defmethod merge-constraint (c1 (c2 (eql :var))) c1)
+(defun merge-constraint (c1 c2)
+  (cond ((equalp c1 c2) c1)
+        ((and (alias? c1)
+              (alias? c2))
+         `(:alias ,@(sort (append (rest c1) (rest c2)) #'string<)))))
 
 (defun get-constraint (var constraint)
   (gethash var constraint))
@@ -24,11 +25,16 @@
 (defun add-constraint% (var type constraint)
   (setf (gethash var constraint) type))
 
+;; ok, so, we want to change this
 (defun add-constraint (var type constraint)
   (aif (gethash var constraint)
        ;; If a constraints already exists for this variable.
        (add-constraint% var (merge-constraint it type) constraint)
        (add-constraint% var type constraint)))
+
+(defun add-alias (var1 var2 constraint)
+  (add-constraint var2 (list :alias var1) constraint)
+  (add-constraint var1 (list :alias var2) constraint))
 
 (defparameter *constraint* (make-hash-table))
 (defmacro defconstraint (name &body body)

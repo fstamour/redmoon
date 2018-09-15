@@ -17,7 +17,7 @@
    ((integer? atom) :integer)
    ((var? atom) (if (function? (get-var atom env nil))
                     (typeof-function atom env constraint)
-                  (or (get-constraint atom constraint) :var)))
+                  (or (get-constraint atom constraint) (list :alias atom))))
    ((keyword? atom) :keyword)))
 
 ;; FIXME Arg... We should differentiate if-statements from if-expressions
@@ -49,7 +49,7 @@
         (make-type-error "Malformed if (the condition is not a boolean expression): ~S"
                          form))))
 
-(defun typeof-statement (form env constraint)
+(defun typeof-sequence (form env constraint)
   (dolist-butlast (f form)
                   (typeof f env constraint nil)
                   (typeof f env constraint t)))
@@ -60,12 +60,13 @@
     (destructuring-bind (arguments &body body)
         definition
       ;; body
-      (typeof-statement body env new-constraint) ; Called for side-effects
+      (typeof-sequence body env new-constraint) ; Called for side-effects
       (let* ((arguments-types
               ;; arguments
-              (loop :for arg :in arguments :collect (gethash arg new-constraint)))
+              (loop :for arg :in arguments :collect (get-constraint arg new-constraint)))
              (return-type
               (typeof (lastcar body) env new-constraint)))
+        (print (hash-table-plist new-constraint)) ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
         `(:function ,@arguments-types ,return-type)))))
 
 (defun typeof-funcall (form env constraint)
@@ -94,10 +95,9 @@
         :finally (return type)))
 
 (defun typeof-while-statement (form env constraint)
-  ;; TODO
-  ;; Write tests first
-  ;; condition then body
-  :while-statement)
+  (destructuring-bind (cond &rest body) form
+    (bool! cond env constraint)
+    (typeof-sequence body env constraint)))
 
 (defun typeof (form  &optional
                      (env redmoon::*top-level-environment*)
@@ -136,5 +136,5 @@
 ;;; Function call
             (typeof-funcall form env constraint)
 ;;; Sequence
-          (typeof-statement form env constraint)))))
+          (typeof-sequence form env constraint)))))
    (error "Typeof of ~S is nil (this is a bug)." form)))
