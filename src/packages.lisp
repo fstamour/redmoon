@@ -40,7 +40,7 @@
 
    ;; Predicates
    assignation? atom? keyword? var?
-   bool? integer? primitive? function?
+   bool? integer? function?
 
    ;; Host-guest type conversions
    to-bool
@@ -81,6 +81,7 @@
            #:merge-constraint
            #:get-constraint
            #:add-constraint
+           #:add-alias
            #:integer?
            #:integer!
            #:integer*

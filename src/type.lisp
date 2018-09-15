@@ -132,7 +132,7 @@
        (t
         (if (and (var? (car form))
                  (function? (get-var (car form) env))
-                 (not (primitive? (car form))))
+                 (not (keyword? (car form))))
 ;;; Function call
             (typeof-funcall form env constraint)
 ;;; Sequence

@@ -59,13 +59,6 @@
        (or (eq form :true)
            (eq form :false)))))
 
-;; TODO Add test
-;; This is what would be called "keywords" in other language.
-(defun primitive? (atom)
-  (member atom '(if while set
-                  not and or
-                  + - * / mod = /= < > <= >=) ))
-
 (defun function? (form)
   (and (listp form)
        (not (assignation? form))

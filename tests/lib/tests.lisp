@@ -21,7 +21,7 @@
 
 #+nil ;; TODO Doesn't pass yet
 (define-test typeof-exp
-  (is equal '(:function :integer :integer) (type:typeof 'exp)))
+  (is equal '(:function :integer :integer :integer) (type:typeof 'exp)))
 
 (define-test def
   (is = 4
