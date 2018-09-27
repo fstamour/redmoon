@@ -66,7 +66,7 @@
   (is-type :integer (typeof '(set x 2)))
   (is-type :bool (typeof '(set x :true)))
   (is-type :bool (typeof '((set x :true) x)))
-  (check-constraint 'x (:alias a) (typeof '(set x a)))
+  (check-constraint 'x '(:alias a) (typeof '(set x a)))
   (check-constraint 'x :integer (typeof '((set x a) (= x 0))))
   (check-constraint 'x :bool (typeof '((set x a) (not x)))))
 

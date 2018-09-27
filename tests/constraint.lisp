@@ -13,11 +13,11 @@
       ,(append (first (last (last body)))
                '(redmoon:*top-level-environment* *top-level-constraint*))))
   (defmacro is-type (type &body body)
-    `(is eq ,type (with-env ,@body)))
+    `(is equalp ,type (with-env ,@body)))
   (defmacro is-type* (type &body body)
-    `(is eq ,type (with-env* ,@body)))
+    `(is equalp ,type (with-env* ,@body)))
   (defmacro check-constraint (var type &body body)
-    `(is eq ,type (with-env ,@body (get-constraint ,var *top-level-constraint*))))
+    `(is equalp ,type (with-env ,@body (get-constraint ,var *top-level-constraint*))))
   (defmacro with-constraint-dump (&body body)
     `(with-env
       ,@body
