@@ -45,7 +45,7 @@
   (is-constraint :bool (add :bool) (add :bool))
   (is-constraint nil (add :bool) (add :integer)))
 
-(define-test add-aliad
+(define-test add-alias
   (is equalp '((a . (:alias x)) (x . (:alias a)))
       (with-constraint-dump
        (add-alias 'x 'a *top-level-constraint*)))
