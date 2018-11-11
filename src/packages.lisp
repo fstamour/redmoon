@@ -58,11 +58,7 @@
    eval-seq
    eval-funcall
    eval-def)
-<<<<<<< HEAD
-  (:shadow eval))
-=======
   (:shadow eval inspect))
->>>>>>> c3387b817b247857dc2f1a72e9bec9e0640dd4f2
 
 (defpackage :redmoon.type
   (:nicknames type)
@@ -85,6 +81,7 @@
            #:merge-constraint
            #:get-constraint
            #:add-constraint
+           #:add-alias
            #:integer?
            #:integer!
            #:integer*
@@ -96,15 +93,9 @@
   (:use redmoon)
   (:import-from redmoon
                 def
-<<<<<<< HEAD
-                run)
-=======
                 run
                 inspect)
->>>>>>> c3387b817b247857dc2f1a72e9bec9e0640dd4f2
   (:import-from redmoon.type
                 typeof)
-  (:export oddp pairp
+  (:export oddp evenp
            exp))
-
-

@@ -59,13 +59,6 @@
        (or (eq form :true)
            (eq form :false)))))
 
-#+nil
-(defun function? (var env)
-  (let ((def (get-var var env nil)))
-    (if (cdr def) ;; "if there is at least tree elements"
-        t
-        nil)))
-
 (defun function? (form)
   (and (listp form)
        (not (assignation? form))
@@ -238,5 +231,3 @@
                (eval-funcall form env)
 ;;; Sequence
                (eval-seq form env)))))))
-
-
