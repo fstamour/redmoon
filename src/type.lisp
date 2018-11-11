@@ -1,7 +1,47 @@
 
 (in-package redmoon.type)
 
+(defparameter *top-level-constraint*
+  (make-constraint-set)
+  "Top level constraints")
+
+(defparameter *constraint-type* (make-hash-table)
+  "Special variable to keep track of all the type of contraints defined.")
+
+(defmacro defconstraint (name docstring)
+  "Defines 2 function <name>! and <name>* and register the name in *constraint-type*.
+They are helper functions that bridges the function named <name>? and the type inference.
+
+Why those functions needs the environement, and not just the contraints?
+Each of these functions needs the environment because they can call typeof.
+And typeof needs the environment to get the function definitions."
+  (check-type name symbol)
+  (check-type docstring string)
+  `(progn
+     (setf (gethash ',name *constraint-type*) ',docstring)
+     (defun ,(symbolicate name '!) (form env constraint)
+       ,(format nil "Put the constraint ~A on the form and propagate." name)
+       (if (,(symbolicate name '?) form)
+           ,(make-keyword name)
+           (if (var? form)
+               (add-constraint form ,(make-keyword name) constraint)
+               (typeof form env constraint))))
+     (defun ,(symbolicate name '*) (form env constraint)
+       ,(format nil "Put the constraint ~A on each part of the form and propagate." name)
+       ;; (e.g. form == (rest '(+ 1 2 3)))
+       (if (every #'(lambda (form)
+                      (,(symbolicate name '!) form env constraint))
+                  form)
+           ,(make-keyword name)
+           (list :type-error (format nil "~S" form))))))
+
+(defconstraint integer "see integer?")
+
+(defconstraint bool "see bool?")
+
 (defun make-type-error (format-string &rest args)
+  "Create an error.
+Actually creates a string, should probably be a condition."
   (apply #'format nil format-string args))
 
 (defun typeof-atom (atom env constraint)

@@ -1,26 +1,5 @@
-;;;; TODO Signature of programs (e.g. hash, "structural hash" (i.e. two code that have the same structural hash has the same structure).
-;;;; TODO compile-to-asm, disasm, compile-to-lisp
-;;;; TODO Macros! (might render the proofs complex
-;;;; TODO Make a git repo.
-;;;; TODO Analyze
-;;;; TODO   Order (e.g. O(n), O(n^2))
-;;;; TODO   Correctness
 
 (in-package redmoon)
-
-;;;;;;;;;;;;;;;;;;;;;;;;
-;; S ::= skip
-;;       | x := E
-;;       | S; S
-;;       | if B then S_1 else S_2 endif
-;;       | while B do D od
-;; B ::= true | false | not B | B and B | B or B | E ~ E
-;; E ::= n | x | -E | E + E | (E * E) | (E / E)
-
-;; Which is better?
-;; (case 'a ((while if true false) t))
-;; (member 'a '(while if true false))
-
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Predicates
@@ -95,9 +74,11 @@
 ;;;;
 
 (defun to-bool (b)
+  "Convert a generalized boolean to the keyword :true or :false."
   (if b :true :false))
 
 (defun truep (b &optional (error-if-invalid t))
+  "Convert the keywords :true or :false to t or nil."
   (let ((b (make-keyword b)))
     (if (eq :true b)
         t
@@ -122,7 +103,7 @@
      (nth-value 0 (get-var atom env)))))
 
 (defun eval-set (form env)
-  ;; TODO Docstring
+  "Evalutate an assignement form."
   (loop :for (var value) :on (rest form) :by #'cddr
         ;; TODO check (var? var)
         :do
@@ -130,7 +111,7 @@
            (setf (gethash var env) (eval value env))))
 
 (defun eval-if (form &optional (env (make-env)))
-  "Eval an if statement (or is it an expression?)."
+  "Eval an if form."
   (destructuring-bind (test-form then-form &optional else-form)
       (rest form)
     (if (truep (eval test-form env))
@@ -139,7 +120,7 @@
           (eval else-form env)))))
 
 (defun eval-while (form &optional (env (make-env)))
-  "Eval an if while (or is it an expression?)."
+  "Eval an while form."
   (destructuring-bind (condition body)
       (rest form)
     (loop :while (truep (eval condition env))
@@ -170,36 +151,40 @@
                  :always (not (truep truth)))))
 
 (defun eval-def (form env)
-  ;; TODO Warn about re-defininf something.
+  "Add a definition to the enviroment."
+  ;; TODO Warn about re-defining something.
   (setf (gethash (second form) env) (cddr form)))
 
-;; Just like progn
 (defun eval-seq (form env)
+  "Evaluate a sequence of forms and return the value of the last one.
+Just like progn in lisp."
   (loop :for f :on form
         :for v = (eval (car f) env)
         :unless (cdr f) :return v))
 
 (defun eval-funcall(form env)
+  "Evaluate a function call."
   (let ((definition (get-var (car form) env)))
-    ;; (format t "~&Def: ~A" definition)
     (destructuring-bind (arguments &body body)
         definition
-      ;; (format t "~&Args: ~A" arguments)
-      ;; (format t "~&Body: ~A" body)
       (eval-seq body
                 (let ((new-env (make-funcall-env env)))
                   ;; Then bind each argument to its value
                   (loop :for expression :in (rest form)
                         :for arg :in arguments
                         :for i :from 0 ;; TODO Use this (for better error message for example)
-                        ;; TODO Warn when an arguments shadows a function name.
+                                       ;; TODO Warn when an arguments shadows a function name.
                         :do (setf (gethash arg new-env)
                                   (eval expression env)))
                   new-env)))))
 
 
-(defparameter *eval-depth* 0)
+(defparameter *eval-depth* 0
+  "Special variable to keep track of the evaluation depth.
+Useful when developping, to prevent accidental infinite recursion.")
+
 (defun eval (form &optional (env (make-env)))
+  "Evaluate any form, in a new enviroment if none is provided."
   (unless form
     (error "Invalid form 'NIL'"))
   (let ((*eval-depth* (1+ *eval-depth*)))
