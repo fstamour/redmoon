@@ -1,6 +1,8 @@
 
 (in-package #:redmoon.test.type)
 
+;;; Helpers to shorten the tests
+
 (defun hash-table-sorted-alist (hash-table)
   (sort (copy-seq (hash-table-alist hash-table)) #'string< :key #'car))
 
@@ -30,7 +32,9 @@
   (is eq nil (merge-constraint :false :true))
   (is eq :true (merge-constraint :true :true))
   (is eq :false (merge-constraint :false :false))
-  (is equalp '(:alias x y) (merge-constraint '(:alias x) '(:alias y))))
+  (is equalp '(:alias x y) (merge-constraint '(:alias x) '(:alias y)))
+  (is eq ':integer (merge-constraint '(:alias x) :integer))
+  (is eq ':integer (merge-constraint :integer '(:alias x))))
 
 (defmacro is-constraint (type &body body)
   `(check-constraint
@@ -53,3 +57,4 @@
       (with-constraint-dump
        (add-alias 'x 'a *top-level-constraint*)
        (add-alias 'y 'a *top-level-constraint*))))
+

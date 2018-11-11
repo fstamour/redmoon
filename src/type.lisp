@@ -1,17 +1,11 @@
 
 (in-package redmoon.type)
 
-;; TODO (define-condition type-error () )
 (defun make-type-error (format-string &rest args)
   (apply #'format nil format-string args))
-#+nil
-(defun make-type-error (datum expected-type)
-  (make-condition
-   'type-error :datum datum
-               :expected-type expected-type))
-
 
 (defun typeof-atom (atom env constraint)
+  "Infer the type of an atom. Updates the constraints."
   (cond
    ((bool? atom) :bool)
    ((integer? atom) :integer)
@@ -20,15 +14,8 @@
                   (or (get-constraint atom constraint) (list :alias atom))))
    ((keyword? atom) :keyword)))
 
-;; FIXME Arg... We should differentiate if-statements from if-expressions
-;; In if-statement we don't care that the then-form as a different type
-;; than then else-form.
-;; But for an if-expression, we care.
-;; Must the else-form be required for an expression?
-;; Because, if not, the return type will either be nil (invalid) of (typeof then-form).
-;;
-;; NOTE: The only place an "if" is not an expression is inside a sequence.
 (defun typeof-if-statement (form env constraint)
+  "Infer the type an if statement (i.e. an if whithin a sequence). Updates the contraints."
   (destructuring-bind (test-form then-form &optional else-form)
       (rest form)
     (if (eq :bool (typeof test-form env constraint))
@@ -39,6 +26,7 @@
         (make-type-error "Malformed if: ~S" form))))
 
 (defun typeof-if-expression (form env constraint)
+  "Infer the type an if expression. Updates the contraints."
   (destructuring-bind (test-form then-form else-form)
       (rest form)
     (if (eq :bool (typeof test-form env constraint))
@@ -50,11 +38,13 @@
                          form))))
 
 (defun typeof-sequence (form env constraint)
+  "Infer the types of every parts of a sequence. Updates the contraints."
   (dolist-butlast (f form)
                   (typeof f env constraint nil)
                   (typeof f env constraint t)))
 
 (defun typeof-function (name env constraint)
+  "Infer the type of a function, its arguments and return value. Updates the contraints."
   (let ((definition (get-var name env))
         (new-constraint (copy-hash-table constraint)))
     (destructuring-bind (arguments &body body)
@@ -70,6 +60,7 @@
         `(:function ,@arguments-types ,return-type)))))
 
 (defun typeof-funcall (form env constraint)
+  "Infer the type of the expression passed as arguments to a function. Updates the contraints."
   ;; Compute type for each expression passed as argument in the function call.
   (loop :for expression :in (rest form)
         :do (typeof expression env constraint))
@@ -89,52 +80,57 @@
     (third typeof-function)))
 
 (defun typeof-assignement (form env constraint)
+  "Infer the type of variable being assigned.
+The form should look like (set [variable value]*)."
   (loop :for (var value) :on (rest form) :by #'cddr
-        :for type = (typeof value env constraint)
-        :do (add-constraint var type constraint)
-        :finally (return type)))
+        :do
+           (if (var? value)
+               (add-alias var value constraint)
+               (add-constraint var (typeof value env constraint) constraint))))
 
 (defun typeof-while-statement (form env constraint)
+  "Infer the type of a while statement."
   (destructuring-bind (cond &rest body) form
     (bool! cond env constraint)
     (typeof-sequence body env constraint)))
 
 (defun typeof (form  &optional
-                     (env redmoon::*top-level-environment*)
-                     (constraint *top-level-constraint*)
-                     (expression-p t))
+                       (env redmoon::*top-level-environment*)
+                       (constraint *top-level-constraint*)
+                       (expression-p t))
+  "Infer the type of a form. Updates the contraints.
+It needs the enviroment to get the definitions of existing functions."
   (unless form
     (error "Invalid form 'NIL'"))
-  (or
-   (if (atom? form)
+  (if (atom? form)
 ;;; Atom
-       (typeof-atom form env constraint)
-     (case (car form)
+      (typeof-atom form env constraint)
+      (case (car form)
 ;;; Statements
-       (set (typeof-assignement form env constraint))
-       (while (typeof-while-statement form env constraint))
-       (if (if expression-p
-               (typeof-if-expression form env constraint)
-             (typeof-if-statement form env constraint)))
+        (set (typeof-assignement form env constraint))
+        (while (typeof-while-statement form env constraint))
+        (if (if expression-p
+                (typeof-if-expression form env constraint)
+                (typeof-if-statement form env constraint)))
 ;;; Boolean operators
-       (not (bool! (second form) env constraint))
-       ((or and) (bool* (rest form) env constraint))
+        (not (bool! (second form) env constraint))
+        ((or and) (bool* (rest form) env constraint))
 ;;; Arithmetic
-       ((+ - * / mod) (integer* (rest form) env constraint))
+        ((+ - * / mod) (integer* (rest form) env constraint))
 ;;; Comparison
-       ((< > = /= <= >=)
-        (let ((it (integer* (rest form) env constraint)))
-          (if (eq it :integer)
-              :bool
-            it)))
+        ((< > = /= <= >=)
+         (let ((it (integer* (rest form) env constraint)))
+           (if (eq it :integer)
+               :bool
+               it)))
 ;;; Definition
-       (def :def-statement)
-       (t
-        (if (and (var? (car form))
-                 (function? (get-var (car form) env))
-                 (not (keyword? (car form))))
+        (def :def-statement)
+        (t
+         (if (and (var? (car form))
+                  (function? (get-var (car form) env))
+                  (not (keyword? (car form))))
 ;;; Function call
-            (typeof-funcall form env constraint)
+             (typeof-funcall form env constraint)
 ;;; Sequence
-          (typeof-sequence form env constraint)))))
-   (error "Typeof of ~S is nil (this is a bug)." form)))
+             (typeof-sequence form env constraint))))))
+
