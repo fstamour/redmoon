@@ -12,8 +12,9 @@
                 ((:file package)
                  (:file test-utils)
                  (:file core)
+                 (:file constraint)
                  (:file type)
+                 (:file utils)
                  (:module lib
                   :components
                   ((:file tests)))))))
-

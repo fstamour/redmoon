@@ -12,7 +12,7 @@
                 :def
                 :run)
   (:shadowing-import-from :redmoon.user
-                :oddp :pairp
+                :oddp :evenp
                 :exp)
   (:export
    :with-env

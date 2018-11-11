@@ -3,18 +3,12 @@
 (defpackage redmoon.utils
   (:use cl
         alexandria)
-  (:import-from checkl
-                check
-                results)
   (:export dolist-butlast))
 
 (defpackage redmoon
   (:use cl
         alexandria
         redmoon.utils)
-  (:import-from checkl
-                check
-                results)
   (:export
 
    ;; Main interface
@@ -67,9 +61,6 @@
         anaphora
         redmoon
         redmoon.utils)
-  (:import-from checkl
-                check
-                results)
   (:shadowing-import-from redmoon
                           eval
                           integer?
@@ -81,6 +72,7 @@
            #:merge-constraint
            #:get-constraint
            #:add-constraint
+           #:add-alias
            #:integer?
            #:integer!
            #:integer*
@@ -96,7 +88,5 @@
                 inspect)
   (:import-from redmoon.type
                 typeof)
-  (:export oddp pairp
+  (:export oddp evenp
            exp))
-
-
