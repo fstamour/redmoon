@@ -4,6 +4,5 @@
 (def oddp (n)
   (not (= 0 (mod n 2))))
 
-(def pairp (n)
+(def evenp (n)
   (not (oddp n)))
-

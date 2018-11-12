@@ -81,6 +81,7 @@
            #:merge-constraint
            #:get-constraint
            #:add-constraint
+           #:add-alias
            #:integer?
            #:integer!
            #:integer*
@@ -96,7 +97,5 @@
                 inspect)
   (:import-from redmoon.type
                 typeof)
-  (:export oddp pairp
+  (:export oddp evenp
            exp))
-
-

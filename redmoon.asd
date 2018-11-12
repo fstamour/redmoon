@@ -17,5 +17,5 @@
              (:file type :depends-on (constraint))))
    (:module lib
     :components
-            ((:file oddp+pairp)
+            ((:file oddp+evenp)
              (:file exponential)))))

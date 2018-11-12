@@ -2,13 +2,13 @@
 (def oddp (n)
   (not (= 0 (mod n 2))))
 
-(def pairp (n)
+(def evenp (n)
   (not (oddp n)))
 
 (def div-by-4-p (n)
   (= 0 (mod n 4)))
 
-(map-pred '(oddp pairp div-by-4-p))
+(map-pred '(oddp evenp div-by-4-p))
 =>
 (let ((e1 (mod 2 n))
       (e2 (= 0 e1)))
