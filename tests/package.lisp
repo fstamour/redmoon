@@ -39,6 +39,7 @@
 (defun test-all (&optional exit-p)
   (or
    (test '(:redmoon.test
+           :redmoon.test.core.macros
            :redmoon.test.core
            :redmoon.test.type))
    (exit -1 (not exit-p))))
@@ -54,7 +55,7 @@
   (:use :parachute)
   (:import-from :redmoon.test
    :with-env)
-  (:reexport :cl :alexandria :redmoon :redmoon))
+  (:reexport :cl :alexandria :redmoon))
 
 (uiop:define-package :redmoon.test.type
     (:mix

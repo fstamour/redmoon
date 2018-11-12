@@ -2,6 +2,7 @@
 (defpackage :redmoon.core.macros
   (:use :cl :alexandria)
   (:import-from :redmoon
+                #:while
                 #:atom?
                 #:var?))
 
@@ -18,11 +19,6 @@ Else, increment depth and check if its greater that max-depth."
          (if (< ,max-depth ,depth) (error "Max eval depth exceeded."))
          ,body)
       body))
-
-#+nil
-(progn
-  (wrap-in-max-depth nil 'asdf '(some body))
-  (wrap-in-max-depth 10 'asdf '(some body)))
 
 (defun declare-max-depth-variable (max-depth depth)
   (when max-depth

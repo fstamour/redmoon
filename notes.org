@@ -27,6 +27,33 @@ certain values. They can (should?) be thought as types.
 ** Should the constraints be part of the environment?
 
 
+* Symbols
+
+Re-exporting symbols from the cl packages causes problems with the documentation
+generator (staple).
+
+e.g. the symbol cl:* shows up as "the value of the most recent top level eval".
+** Maybe change the generator
+
+Which one?
+Which one doesn't have the same problem?
+
+Maybe look at shinmera's doc-utils?
+
+** Maybe tweak the generator
+
+Some kind of override?
+
+** Export new symbols
+
+Then there will be many conflicts if you "use" the package, e.g. lots of shadowing.
+
+** Make the "language-processor" more lenient.
+
+I think I have to do it anyway (see PR#8).
+
+** See cl-dsl
+
 * Statement v.s. Expression
 
 FIXME Arg... We should differentiate if-statements from if-expressions

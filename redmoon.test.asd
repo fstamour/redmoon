@@ -11,6 +11,7 @@
                 :components
                 ((:file package)
                  (:file test-utils)
+                 (:file language-processor)
                  (:file core)
                  (:file constraint)
                  (:file type)
