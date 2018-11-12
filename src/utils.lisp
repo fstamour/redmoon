@@ -2,6 +2,7 @@
 (in-package :redmoon.utils)
 
 (defmacro dolist-butlast ((var list) body-butlast body-last)
+  "Like dolist, but with a different body for the last element of the list."
   (check-type var symbol)
   (with-gensyms (iterator)
     `(progn

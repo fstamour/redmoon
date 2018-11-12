@@ -1,0 +1,52 @@
+
+* Grammar
+
+S ::= skip
+      | x := E
+      | S; S
+      | if B then S_1 else S_2 endif
+      | while B do D od
+B ::= true | false | not B | B and B | B or B | E ~ E
+E ::= n | x | -E | E + E | (E * E) | (E / E)
+
+* Environment
+
+Currently, the environments are very simple objects. They simply are hash-tables
+and they store variables and functions all the same.
+
+* Constraints
+
+Constraints applies to variables. They specify that a variable is constraint to
+certain values. They can (should?) be thought as types.
+
+** Type of constraints
+*** integer
+*** bool
+*** alias of another variable
+**** It's like saying that the variables are of the same type.
+** Should the constraints be part of the environment?
+
+
+* Statement v.s. Expression
+
+FIXME Arg... We should differentiate if-statements from if-expressions
+In if-statement we don't care that the then-form as a different type
+than then else-form.
+But for an if-expression, we care.
+Must the else-form be required for an expression?
+Because, if not, the return type will either be nil (invalid) of (typeof then-form).
+
+NOTE: The only place an "if" is not an expression is inside a sequence.
+
+Is there a difference between a while statement or expression?
+
+* Other ideas
+** Signature of programs (e.g. hash, "structural hash" (i.e. two code that have the same structural hash has the same structure).
+** compile-to-asm, disasm, compile-t-lisp
+** Macros! (might render the proofs complex)
+** Analyze
+*** Order (e.g. O(n), O(n^2))
+*** Correctness
+** We could augment the constraints with pre/post conditions.
+
+

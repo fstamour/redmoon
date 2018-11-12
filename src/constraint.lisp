@@ -5,11 +5,8 @@
   "Create an object to hold a collection of constraints."
   (make-hash-table))
 
-(defparameter *top-level-constraint*
-  (make-constraint-set)
-  "Top level constraints")
-
 (defun alias? (constraint)
+  "Predicate that returns true if the constraint is of type alias."
   (and (listp constraint)
        (eq :alias (first constraint))))
 
@@ -33,6 +30,7 @@
   constraint)
 
 (defun get-constraint (var constraint)
+  "Get the constraint on a variable."
   (gethash var constraint))
 
 (defun add-constraint% (var type constraint)
@@ -40,12 +38,14 @@
 
 ;; ok, so, we want to change this
 (defun add-constraint (var type constraint)
+  "Add a contraints to a variable, merge the constraints with the exising ones if there are any."
   (aif (gethash var constraint)
        ;; If a constraints already exists for this variable.
        (add-constraint% var (merge-constraint it type) constraint)
        (add-constraint% var type constraint)))
 
 (defun add-alias (var1 var2 constraint)
+  "Add a constraint of type alias on two variables."
   (add-constraint var2 (list :alias var1) constraint)
   (add-constraint var1 (list :alias var2) constraint))
 
