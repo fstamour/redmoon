@@ -26,7 +26,8 @@
      #:dispatch
      #:handle-arithmetic-and-comparison
      #:handle-grouping
-     #:declare-root-function )))
+     #:declare-root-function
+     #:make-walker-spec)))
 
 (define-test wrap-in-max-depth
   (is equalp '(some body)
@@ -47,32 +48,44 @@
        (dispatch 'eval 'atom)))
 
 (define-test handle-arithmetic-and-comparison
-  (is eq nil (handle-arithmetic-and-comparison 'a nil nil nil))
+  (is eq nil (handle-arithmetic-and-comparison (make-walker-spec :name 'a)))
   (is equal
       '(((+ - * / mod) (a-arithmetic form environment)))
-      (handle-arithmetic-and-comparison 'a t nil nil))
+      (handle-arithmetic-and-comparison
+       (make-walker-spec :name 'a :group-arithmetic t)))
   (is equal
       '(((< > = /= <= >=) (a-comparison form environment)))
-      (handle-arithmetic-and-comparison 'a nil t nil))
+      (handle-arithmetic-and-comparison
+       (make-walker-spec :name 'a :group-comparison t)))
   (is equal
       '(((+ - * / mod) (a-arithmetic form environment))
         ((< > = /= <= >=) (a-comparison form environment)))
-      (handle-arithmetic-and-comparison 'a t t nil)))
+      (handle-arithmetic-and-comparison
+       (make-walker-spec :name 'a
+                         :group-arithmetic t
+                         :group-comparison t))))
 
 (define-test handle-grouping
   (is equal
       '(set redmoon:while if not or and redmoon.core.macros::def + - * / mod < > = /=
         <= >=)
-      (handle-grouping nil nil nil))
+      (handle-grouping (make-walker-spec)))
   (is equal
       '(set redmoon:while if not or and redmoon.core.macros::def < > = /= <= >=)
-      (handle-grouping t nil nil))
+      (handle-grouping (make-walker-spec :group-arithmetic t)))
   (is equal
       '(set redmoon:while if not or and redmoon.core.macros::def + - * / mod)
-      (handle-grouping nil t nil))
+      (handle-grouping (make-walker-spec :group-comparison t)))
   (is equal
-      (handle-grouping t t nil)
-      (handle-grouping nil nil t)))
+      '(set redmoon:while if not or and redmoon:def)
+      (handle-grouping (make-walker-spec
+                        :group-arithmetic t
+                        :group-comparison t)))
+  (is equal
+      (handle-grouping (make-walker-spec
+                             :group-arithmetic t
+                             :group-comparison t))
+      (handle-grouping (make-walker-spec :group-arithmetic-and-comparison t))))
 
 (define-test declare-root-function
   (is equal
@@ -92,7 +105,9 @@
            (if (redmoon:var? (car form))
                (eval2-funcall form environment)
                (eval2-seq form environment)))))
-      (declare-root-function 'eval2 nil nil t)))
+      (declare-root-function
+       (make-walker-spec :name 'eval2
+                         :group-arithmetic-and-comparison t))))
 
 ;;;; Putting it all together
 
