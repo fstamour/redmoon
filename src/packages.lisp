@@ -1,28 +1,17 @@
+
 (in-package :cl-user)
 
-(defpackage redmoon.utils
-  (:use cl
-        alexandria)
-  (:export dolist-butlast))
-
-(defpackage redmoon
-  (:use cl
+(uiop:define-package redmoon
+  (:mix cl
         alexandria
-        redmoon.utils)
+        redmoon.utils
+        redmoon.symbol)
+  (:use-reexport redmoon.symbol)
   (:export
 
    ;; Main interface
    eval
-   def
    run
-
-   ;; keywords
-   true false
-   + - * / mod = /= < > <= >=
-   not and or
-   set
-   while
-   if
 
    ;; Environment
    get-var

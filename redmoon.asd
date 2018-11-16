@@ -9,9 +9,10 @@
   :components
   ((:module src
     :components
-    ((:file packages)
-     (:file utils :depends-on (packages))
-     (:file core :depends-on (packages))
+    ((:file utils)
+     (:file symbol)
+     (:file packages)
+     (:file core :depends-on (packages symbol))
      (:file language-processor :depends-on (core))
      (:file eval :depends-on (packages core language-processor))
      (:file top-level :depends-on (core))

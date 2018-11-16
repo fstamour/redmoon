@@ -1,4 +1,9 @@
 
+(defpackage redmoon.utils
+  (:use cl
+        alexandria)
+  (:export dolist-butlast))
+
 (in-package :redmoon.utils)
 
 (defmacro dolist-butlast ((var list) body-butlast body-last)

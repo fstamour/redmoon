@@ -65,10 +65,10 @@
         <= >=)
       (handle-grouping nil nil nil))
   (is equal
-      (set redmoon:while if not or and def < > = /= <= >=)
+      '(set redmoon:while if not or and redmoon.core.macros::def < > = /= <= >=)
       (handle-grouping t nil nil))
   (is equal
-      (set redmoon:while if not or and def + - * / mod)
+      '(set redmoon:while if not or and redmoon.core.macros::def + - * / mod)
       (handle-grouping nil t nil))
   (is equal
       (handle-grouping t t nil)
