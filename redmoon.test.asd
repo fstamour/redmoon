@@ -9,7 +9,8 @@
   :serial t
   :components ((:module tests
                 :components
-                ((:file package)
+                ((:file third-party-fix)
+                 (:file package)
                  (:file test-utils)
                  (:file language-processor)
                  (:file core)

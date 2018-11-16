@@ -2,9 +2,11 @@
 (defpackage :redmoon.core.macros
   (:use :cl :alexandria)
   (:import-from :redmoon
+                #:def
                 #:while
                 #:atom?
-                #:var?))
+                #:var?)
+  (:export #:define-processor))
 
 (in-package :redmoon.core.macros)
 
@@ -43,14 +45,6 @@ Else, increment depth and check if its greater that max-depth."
       `((+ - * / mod < > = /= <= >=)
         ,(dispatch name 'arithmetic-and-comparison))))))
 
-#+nil
-(progn
-  (handle-arithmetic-and-comparison 'a nil nil nil)
-  (handle-arithmetic-and-comparison 'a t nil nil)
-  (handle-arithmetic-and-comparison 'a nil t nil)
-  (handle-arithmetic-and-comparison 'a t t nil)
-  (handle-arithmetic-and-comparison 'a nil nil t))
-
 (defun handle-grouping (group-arithmetic
                         group-comparison
                         group-arithmetic-and-comparison)
@@ -61,16 +55,6 @@ Else, increment depth and check if its greater that max-depth."
           (when (not (or group-arithmetic-and-comparison
                          group-comparison))
             '(< > = /= <= >=))))
-
-#+nil
-(progn
-  (handle-grouping nil nil nil)
-  ;;
-  (handle-grouping t nil nil)
-  (handle-grouping nil t nil)
-  ;; These two should return the same thing
-  (handle-grouping t t nil)
-  (handle-grouping nil nil t))
 
 (defun declare-root-function (name
                               group-arithmetic
@@ -102,9 +86,6 @@ Else, increment depth and check if its greater that max-depth."
 ;;; Sequence
                      ,(dispatch name 'seq)))))))))
 
-#+nil (declare-root-function 'eval2 nil nil t)
-
-
 (defmacro define-processor (name &key
                                    max-depth
                                    if-not-handled
@@ -129,31 +110,4 @@ Else, increment depth and check if its greater that max-depth."
                                    group-comparison
                                    group-arithmetic-and-comparison))
           ,if-not-handled)))))
-
-(export 'define-processor)
-
-
-#+nil
-(progn
-  (define-processor eval2 :group-arithmetic-and-comparison t)
-
-  (progn
-    (defmacro %eval2 ()
-      `(progn
-         ,@(loop :for element :in (append '(set while if not or and def)
-                                          '(seq funcall atom))
-                 :collect
-                 `(defun ,(symbolicate 'eval2- element) (form environment)
-                    (,(format-symbol 'redmoon "EVAL-~a" element) form environment)))))
-    (%eval2))
-
-  (defun eval2-arithmetic-and-comparison (form environment)
-    (let ((result (apply (symbol-function (car form))
-                         (redmoon:map-eval (rest form) environment))))
-      (if (numberp result)
-          (nth-value 0 (floor result))
-          (redmoon:to-bool result))))
-
-  (eval2 '(+ 1 2) (redmoon:make-env)))
-
 

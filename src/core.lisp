@@ -12,7 +12,7 @@
   (and (symbolp form)
        (member (make-keyword form)
                '(:if :set :while
-                 :+ :- :* :/ := :/= :< :> :<= :>= :true :false))))
+                 :+ :- :* :/ := :/= :< :> :<= :>= :true :false :def))))
 
 (defun var? (form)
   "Returns true if the form is a symbol but is not a keyword of the language."
@@ -96,5 +96,4 @@ Functions are treated as variables that has their definiton as value."
         (unless (eq :false b)
           (when error-if-invalid
             (error "Boolean values must be 'true' or 'false'. Got ~S" b))))))
-
 
