@@ -26,7 +26,6 @@ certain values. They can (should?) be thought as types.
 **** It's like saying that the variables are of the same type.
 ** Should the constraints be part of the environment?
 
-
 * Symbols
 
 Re-exporting symbols from the cl packages causes problems with the documentation

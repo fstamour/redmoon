@@ -36,6 +36,7 @@
 (defun add-constraint% (var type constraint)
   (setf (gethash var constraint) type))
 
+;; ok, so, we want to change this
 (defun add-constraint (var type constraint)
   "Add a contraints to a variable, merge the constraints with the exising ones if there are any."
   (aif (gethash var constraint)
