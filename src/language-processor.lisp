@@ -92,11 +92,11 @@ Else, increment depth and check if its greater that max-depth."
 ;;; Sequence
                        ,(dispatch name 'seq))))))))))
 
-(defun warn-for-undefined-functions (walker-spec)
+(defun check-for-undefined-functions (walker-spec)
   (loop :for function :in (auxililry-function-list walker-spec)
         :collect
         `(unless (fboundp ',function)
-           (warn "Function \"~a\" is not defined." ',function))))
+           (error "Function \"~a\" is not defined." ',function))))
 
 (defmacro define-processor (name &key
                                    max-depth
@@ -109,7 +109,7 @@ Else, increment depth and check if its greater that max-depth."
   (with-spec (walker-spec)
     (with-gensyms (depth)
       `(progn
-         ,@(warn-for-undefined-functions walker-spec)
+         ,@(check-for-undefined-functions walker-spec)
          ,(declare-max-depth-variable max-depth depth)
          (defun ,name
              ,(if optional-environment-p

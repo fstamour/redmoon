@@ -139,6 +139,10 @@ The form should look like (set [variable value]*)."
 #+nil (redmoon.core.macros:define-processor typeof
           :group-arithmetic-and-comparison t)
 
+#+nil
+(defun typeof-arithmetic (form env)
+  (integer* (rest form) env))
+
 (defun typeof (form  &optional
                        (env redmoon::*top-level-environment*)
                        (constraint *top-level-constraint*)
