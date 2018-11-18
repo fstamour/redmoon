@@ -5,8 +5,7 @@
 ;;;; Eval
 ;;;;
 
-;; TODO Remove the (make-env)
-(defun eval-atom (atom &optional (env (make-env)))
+(defun eval-atom (atom env)
   "Evalutate an atom (either a value or a variable)."
   (cond
     ((numberp atom)
@@ -25,7 +24,7 @@
            ;; (if *trace-assignations*) ;; TODO
            (setf (gethash var env) (eval value env))))
 
-(defun eval-if (form &optional (env (make-env)))
+(defun eval-if (form env)
   "Eval an if form."
   (destructuring-bind (test-form then-form &optional else-form)
       (rest form)
@@ -34,7 +33,7 @@
         (when else-form
           (eval else-form env)))))
 
-(defun eval-while (form &optional (env (make-env)))
+(defun eval-while (form env)
   "Eval a while form."
   (destructuring-bind (condition body)
       (rest form)

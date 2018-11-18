@@ -100,11 +100,11 @@
   (fail (truep 42)))
 
 (define-test eval-atom
-  (is = 42 (eval-atom 42))
-  (fail (eval-atom 42.5))
-  (is eq :true (eval-atom :true))
-  (is eq :false (eval-atom :false))
-  (fail (eval-atom 'x))
+  (is = 42 (eval-atom 42 nil))
+  (fail (eval-atom 42.5 nil))
+  (is eq :true (eval-atom :true nil))
+  (is eq :false (eval-atom :false nil))
+  (fail (eval-atom 'x nil))
   (is = 42 (eval-atom 'x (make-env '(x 42))))
   (is = 42
       (with-env
@@ -169,9 +169,9 @@
   (is eq :true (eval '(= 1 1 1 1))))
 
 (define-test eval-if
-  (is = 42 (eval-if '(if true 42 -1)))
-  (is = -1 (eval-if '(if false 42 -1)))
-  (is = -1 (eval-if '(if (< 1 0) 42 -1))))
+  (is = 42 (eval-if '(if true 42 -1) nil))
+  (is = -1 (eval-if '(if false 42 -1) nil))
+  (is = -1 (eval-if '(if (< 1 0) 42 -1) nil)))
 
 (define-test loop
   (is = 0
