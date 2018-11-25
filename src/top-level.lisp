@@ -1,18 +1,19 @@
 
 (in-package :redmoon)
 
-(defvar *top-level-environment* (make-env))
+(setf context:*context* (context:make))
 
 (defmacro def (&whole whole var &body body)
   "Define a top-level variable or function."
-  `(eval-def ',whole *top-level-environment*))
+  `(set-function ',whole))
 
 (defmacro run (&body form)
   "Evaluate a form in the current environment."
-  `(eval ',form *top-level-environment*))
+  `(eval ',form *context*))
 
+;; TODO WIP
 (defun inspect (symbol)
   "Pretty print a variable or function form the current environment."
   (check-type symbol symbol)
-  (pprint `(def ,symbol ,@(gethash symbol *top-level-environment*))))
+  (pprint `(def ,symbol ,@(gethash symbol *context*))))
 

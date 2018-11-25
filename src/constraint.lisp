@@ -1,17 +1,13 @@
 
 (in-package #:redmoon.type)
 
-(defun make-constraint-set ()
-  "Create an object to hold a collection of constraints."
-  (make-hash-table))
-
 (defun alias? (constraint)
   "Predicate that returns true if the constraint is of type alias."
   (and (listp constraint)
        (eq :alias (first constraint))))
 
 (defun merge-constraint (c1 c2)
-  "Merge two contraints c1 and c2"
+  "Merge two constraints c1 and c2"
   (cond
     ;; Return the first one if they are the same
     ((equalp c1 c2) c1)
@@ -26,26 +22,34 @@
 
 (defun merge-constraint-alias (constraint alias)
   (declare (ignorable alias))
-  "Merge two contraints, where one of them is an alias constraint."
+  "Merge two constraints, where one of them is an alias constraint."
   constraint)
 
-(defun get-constraint (var constraint)
-  "Get the constraint on a variable."
-  (gethash var constraint))
+(defun make-constraint-set  ()
+  (fset:map))
 
-(defun add-constraint% (var type constraint)
-  (setf (gethash var constraint) type))
+(context:defconstructor constraint
+  (fset:with context :constraint (make-constraint-set)))
 
-;; ok, so, we want to change this
-(defun add-constraint (var type constraint)
-  "Add a contraints to a variable, merge the constraints with the exising ones if there are any."
-  (aif (gethash var constraint)
+(context:defaccessor :constraint)
+
+(defun get-constraint (constraint var)
+  (fset:lookup constraint var))
+
+(defun add-constraint% (constraint var type)
+  (setf (fset:lookup constraint var) type)
+  constraint)
+
+(defun add-constraint (constraint var type)
+  "Add a constraints to a variable, merge the constraints with the exising ones if there are any."
+  (aif (get-constraint constraint var)
        ;; If a constraints already exists for this variable.
-       (add-constraint% var (merge-constraint it type) constraint)
-       (add-constraint% var type constraint)))
+       (add-constraint% constraint var (merge-constraint it type))
+       (add-constraint% constraint var type)))
 
-(defun add-alias (var1 var2 constraint)
+(defun add-alias (constraint var1 var2)
   "Add a constraint of type alias on two variables."
-  (add-constraint var2 (list :alias var1) constraint)
-  (add-constraint var1 (list :alias var2) constraint))
+  (alet
+      (add-constraint constraint var2 (list :alias var1))
+    (add-constraint it var1 (list :alias var2))))
 

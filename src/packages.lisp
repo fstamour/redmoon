@@ -4,22 +4,25 @@
 (uiop:define-package redmoon
   (:mix cl
         alexandria
-        redmoon.utils
-        redmoon.symbol)
-  (:use-reexport redmoon.symbol)
+        redmoon.utils)
+  (:use-reexport
+   redmoon.symbol
+   redmoon.context)
   (:export
 
    ;; Main interface
    eval
+   def
    run
+   inspect
 
    ;; Environment
-   get-var
-   make-env
-   copy-env
-   *top-level-environment*
-   make-constraint-set
-   *top-level-constraint*
+   get-variable
+   get-function-definition
+
+   add-context-construction-hook
+   define-context-accessor
+   *context*
 
    ;; Predicates
    assignation? atom? keyword? var?
@@ -27,36 +30,21 @@
 
    ;; Host-guest type conversions
    to-bool
-   truep
-
-   ;; All kind of evaluations
-   eval-atom
-   eval-set
-   eval-if
-   eval-while
-   map-eval
-   eval-not
-   eval-or
-   eval-and
-   eval-seq
-   eval-funcall
-   eval-def)
+   truep)
   (:shadow eval inspect))
 
-(defpackage :redmoon.type
-  (:nicknames type)
-  (:use cl
-        alexandria
-        anaphora
-        redmoon
-        redmoon.utils)
-  (:shadowing-import-from redmoon
-                          eval
-                          integer?
-                          bool?
-                          function?)
+(uiop:define-package :redmoon.type
+    (:nicknames #:type)
+  (:use #:redmoon.utils)
+  (:mix
+   redmoon
+   cl
+   alexandria
+   anaphora)
+  (:import-from #:fset
+                #:loopkup)
   (:export #:typeof
-           #:*top-level-constraint*
+           #:*context*
            #:make-constraint-set
            #:merge-constraint
            #:get-constraint
@@ -69,13 +57,15 @@
            #:bool!
            #:bool*))
 
-(defpackage redmoon.user
-  (:use redmoon)
-  (:import-from redmoon
-                def
-                run
-                inspect)
-  (:import-from redmoon.type
-                typeof)
-  (:export oddp evenp
-           exp))
+(uiop:define-package redmoon.user
+    (:use #:redmoon)
+  (:import-from #:redmoon
+                #:def
+                #:run
+                #:inspect)
+  (:import-from #:redmoon.type
+                #:typeof)
+  (:export #:oddp
+           #:evenp
+           #:exp))
+

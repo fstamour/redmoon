@@ -19,8 +19,8 @@ Else, increment depth and check if its greater that max-depth."
     `(defparameter ,depth 0)))
 
 (defun dispatch (name what)
-  "Generate the function call with form and environment."
-  `(,(symbolicate name '- what) form environment))
+  "Generate the function call with form and context."
+  `(,(symbolicate name '- what) context form))
 
 (defun handle-arithmetic-and-comparison (walker-spec)
   "Generate \"case\" clauses for arithmetic and comparison with different grouping."
@@ -101,7 +101,6 @@ Else, increment depth and check if its greater that max-depth."
 (defmacro define-processor (name &key
                                    max-depth
                                    if-not-handled
-                                   optional-environment-p
                                    group-arithmetic
                                    group-comparison
                                    group-arithmetic-and-comparison)
@@ -111,10 +110,7 @@ Else, increment depth and check if its greater that max-depth."
       `(progn
          ,@(check-for-undefined-functions walker-spec)
          ,(declare-max-depth-variable max-depth depth)
-         (defun ,name
-             ,(if optional-environment-p
-                  `(form &optional environment)
-                  `(form environment))
+         (defun ,name (context form)
            (unless form
              (error "Invalid form 'NIL'"))
            (or

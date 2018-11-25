@@ -1,9 +1,17 @@
 
 (in-package redmoon.type)
 
-(defparameter *top-level-constraint*
-  (make-constraint-set)
-  "Top level constraints")
+(context:defconstructor
+    type-contraints
+  (fset:map (fset:$ context)
+            (:function-type (fset:map))
+            (:variable-type (fset:map))))
+
+(context:defaccessor*
+    :function-type
+    :variable-type)
+
+;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defparameter *constraint-type* (make-hash-table)
   "Special variable to keep track of all the type of contraints defined.")
@@ -92,11 +100,11 @@ Actually creates a string, should probably be a condition."
       ;; body
       (typeof-sequence body env new-constraint) ; Called for side-effects
       (let* ((arguments-types
-              ;; arguments
-              (loop :for arg :in arguments :collect (get-constraint arg new-constraint)))
+               ;; arguments
+               (loop :for arg :in arguments :collect (get-constraint arg new-constraint)))
              (return-type
-              (typeof (lastcar body) env new-constraint)))
-        (print (hash-table-plist new-constraint)) ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+               (typeof (lastcar body) env new-constraint)))
+        (hash-table-plist new-constraint)
         `(:function ,@arguments-types ,return-type)))))
 
 (defun typeof-funcall (form env constraint)
@@ -143,10 +151,7 @@ The form should look like (set [variable value]*)."
 (defun typeof-arithmetic (form env)
   (integer* (rest form) env))
 
-(defun typeof (form  &optional
-                       (env redmoon::*top-level-environment*)
-                       (constraint *top-level-constraint*)
-                       (expression-p t))
+(defun typeof (form context &optional (expression-p t))
   "Infer the type of a form. Updates the contraints.
 It needs the enviroment to get the definitions of existing functions."
   (unless form

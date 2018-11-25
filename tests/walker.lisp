@@ -1,15 +1,9 @@
 
-(uiop:define-package :redmoon.test.core.macros
-    (:use :cl :alexandria)
-  (:use :redmoon.core.macros)
-  (:shadowing-import-from :parachute
-   :of-type)
-  (:use :parachute)
-  (:import-from :redmoon.test
-   :with-env)
-  (:reexport :cl :alexandria :redmoon))
+(uiop:define-package :redmoon.core.macros.test
+    (:use :cl :alexandria :redmoon.test)
+  (:use :redmoon.core.macros))
 
-(in-package #:redmoon.test.core.macros)
+(in-package #:redmoon.core.macros.test)
 
 (eval-when (:load-toplevel :compile-toplevel :execute)
   (defun import-internal (package symbols)
@@ -20,7 +14,7 @@
 
   (import-internal
    '#:redmoon.core.macros
-   '(#:form #:environment ;; #:def
+   '(#:form #:context ;; #:def
      #:wrap-in-max-depth
      #:declare-max-depth-variable
      #:dispatch
@@ -44,22 +38,22 @@
 
 (define-test dispatch
   (is equalp
-      '(eval-atom form environment)
+      '(eval-atom context form)
        (dispatch 'eval 'atom)))
 
 (define-test handle-arithmetic-and-comparison
   (is eq nil (handle-arithmetic-and-comparison (make-walker-spec :name 'a)))
   (is equal
-      '(((+ - * / mod) (a-arithmetic form environment)))
+      '(((+ - * / mod) (a-arithmetic context form)))
       (handle-arithmetic-and-comparison
        (make-walker-spec :name 'a :group-arithmetic t)))
   (is equal
-      '(((< > = /= <= >=) (a-comparison form environment)))
+      '(((< > = /= <= >=) (a-comparison context form)))
       (handle-arithmetic-and-comparison
        (make-walker-spec :name 'a :group-comparison t)))
   (is equal
-      '(((+ - * / mod) (a-arithmetic form environment))
-        ((< > = /= <= >=) (a-comparison form environment)))
+      '(((+ - * / mod) (a-arithmetic context form))
+        ((< > = /= <= >=) (a-comparison context form)))
       (handle-arithmetic-and-comparison
        (make-walker-spec :name 'a
                          :group-arithmetic t
@@ -90,21 +84,21 @@
 (define-test declare-root-function
   (is equal
       '(if (redmoon:atom? form)
-        (eval2-atom form environment)
+        (eval2-atom context form)
         (case (car form)
-          (set (eval2-set form environment))
-          (redmoon:while (eval2-while form environment))
-          (if (eval2-if form environment))
-          (not (eval2-not form environment))
-          (or (eval2-or form environment))
-          (and (eval2-and form environment))
-          (redmoon.core.macros::def (eval2-def form environment))
+          (set (eval2-set context form))
+          (redmoon:while (eval2-while context form))
+          (if (eval2-if context form))
+          (not (eval2-not context form))
+          (or (eval2-or context form))
+          (and (eval2-and context form))
+          (redmoon.core.macros::def (eval2-def context form))
           ((+ - * / mod < > = /= <= >=)
-           (eval2-arithmetic-and-comparison form environment))
+           (eval2-arithmetic-and-comparison context form))
           (t
            (if (redmoon:var? (car form))
-               (eval2-funcall form environment)
-               (eval2-seq form environment)))))
+               (eval2-funcall context form)
+               (eval2-seq context form)))))
       (declare-root-function
        (make-walker-spec :name 'eval2
                          :group-arithmetic-and-comparison t))))
@@ -117,31 +111,34 @@
      ,@(loop :for element :in (append '(set while if not or and def)
                                       '(seq funcall atom))
              :collect
-             `(defun ,(symbolicate name '- element) (form environment)
+             `(defun ,(symbolicate name '- element) (context form)
+                (declare (ignorable context)
+                         (ignorable form))
                 (format nil "~a-~a" ',name ',element)))))
 
-(defun fake-eval-arithmetic-and-comparison (form environment)
+(defun fake-eval-arithmetic-and-comparison (context form)
+  (declare (ignorable context)
+           (ignorable form))
   (symbol-name 'fake-eval-arithmetic-and-comparison))
 
 (mock-walker-function fake-eval)
 
 (define-processor
     fake-eval
-    :optional-environment-p t
   :group-arithmetic-and-comparison t
   :max-depth 100)
 
 (define-test define-processor
-  (is equalp "fake-eval-while" (fake-eval '(redmoon:while (smth) 42)))
-  (is equalp "fake-eval-set" (fake-eval '(set x 2)))
-  (is equalp "fake-eval-def" (fake-eval '(redmoon:def x 2)))
-  (is equalp "fake-eval-if" (fake-eval '(if x 2)))
-  (is equalp "fake-eval-atom" (fake-eval 42))
-  (is equalp "fake-eval-atom" (fake-eval :false))
-  (is equalp "fake-eval-seq" (fake-eval '(1)))
-  (is equalp "fake-eval-arithmetic-and-comparison" (fake-eval '(+ 1)))
-  (is equalp "fake-eval-not" (fake-eval '(not :false)))
-  (is equalp "fake-eval-and" (fake-eval '(and :false)))
-  (is equalp "fake-eval-or" (fake-eval '(or :false)))
-  (is equalp "fake-eval-funcall" (fake-eval '(exp x 42))))
+  (is equalp "fake-eval-while" (fake-eval nil '(redmoon:while (smth) 42)))
+  (is equalp "fake-eval-set" (fake-eval nil '(set x 2)))
+  (is equalp "fake-eval-def" (fake-eval nil '(redmoon:def x 2)))
+  (is equalp "fake-eval-if" (fake-eval nil '(if x 2)))
+  (is equalp "fake-eval-atom" (fake-eval nil  42))
+  (is equalp "fake-eval-atom" (fake-eval nil :false))
+  (is equalp "fake-eval-seq" (fake-eval nil '(1)))
+  (is equalp "fake-eval-arithmetic-and-comparison" (fake-eval nil '(+ 1)))
+  (is equalp "fake-eval-not" (fake-eval nil '(not :false)))
+  (is equalp "fake-eval-and" (fake-eval nil '(and :false)))
+  (is equalp "fake-eval-or" (fake-eval nil '(or :false)))
+  (is equalp "fake-eval-funcall" (fake-eval nil '(exp x 42))))
 

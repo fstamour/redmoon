@@ -2,7 +2,9 @@
 (defpackage redmoon.utils
   (:use cl
         alexandria)
-  (:export dolist-butlast))
+  (:export
+   #:dolist-butlast
+   #:hash-table-sorted-alist))
 
 (in-package :redmoon.utils)
 
@@ -15,4 +17,8 @@
              (,var (car ,iterator) (car ,iterator)))
             ((null (cdr ,iterator)) ,body-last)
          (unless (null (cdr ,iterator)) ,body-butlast)))))
+
+(defun hash-table-sorted-alist (hash-table)
+  "Create a sorted alist from a hash-table."
+  (sort (copy-seq (hash-table-alist hash-table)) #'string< :key #'car))
 

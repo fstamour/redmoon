@@ -14,7 +14,7 @@
   'n)
 
 (defun order-def (form env)
-  )
+  0)
 
 (defun order (form &optional env)
   (unless form

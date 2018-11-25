@@ -1,28 +1,22 @@
 (in-package :cl-user)
 
-(uiop:define-package :redmoon.test
-  (:use :cl)
+(uiop:define-package #:redmoon.test
+  (:use :cl :alexandria)
   (:import-from :parachute
                 :define-test
                 :is :isnt
                 :true :false
                 :fail)
-  (:import-from :redmoon
-                :set
-                :def
-                :run)
-  (:shadowing-import-from :redmoon.user
-                :oddp :evenp
-                :exp)
-  (:export
-   :with-env
-   :test-all)
-  (:reexport
-   :parachute
-   :redmoon
-   :redmoon.user))
+  (:import-from #:redmoon.context
+                #:*context*)
+  (:export :with-context
+           :test-all)
+  (:reexport :cl
+             :alexandria
+             :parachute)
+  (:export #:*context*))
 
-(in-package redmoon.test)
+(in-package #:redmoon.test)
 
 (defun test (designator)
   "Run tests for designator and return true if all the tests passed."
@@ -38,24 +32,13 @@
 
 (defun test-all (&optional exit-p)
   (or
-   (test '(:redmoon.test
+   (test '(
+           :redmoon.test
            :redmoon.test.core.macros
-           :redmoon.test.core
-           :redmoon.test.type))
+           :redmoon.core.test
+           :redmoon.test.type
+           ))
    (exit -1 (not exit-p))))
-
-(uiop:define-package :redmoon.test.core
-  (:use :cl :alexandria)
-  (:shadowing-import-from :redmoon
-   :eval :not :and :or)
-  (:use :redmoon)
-  (:shadowing-import-from :parachute
-   :true :false
-   :of-type)
-  (:use :parachute)
-  (:import-from :redmoon.test
-   :with-env)
-  (:reexport :cl :alexandria :redmoon))
 
 (uiop:define-package :redmoon.test.type
     (:mix

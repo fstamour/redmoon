@@ -1,29 +1,10 @@
 
 (in-package #:redmoon.test.type)
 
-;;; Helpers to shorten the tests
-
-(defun hash-table-sorted-alist (hash-table)
-  (sort (copy-seq (hash-table-alist hash-table)) #'string< :key #'car))
-
 (eval-when (:compile-toplevel :load-toplevel :execute)
-  (defmacro with-env* (&body body)
-    "Like with-env but add implicit arguments to the last form"
-    `(with-env
-      ,@(butlast body)
-      ;; (break)
-      ,(append (first (last (last body)))
-               '(redmoon:*top-level-environment* *top-level-constraint*))))
-  (defmacro is-type (type &body body)
-    `(is equalp ,type (with-env ,@body)))
-  (defmacro is-type* (type &body body)
-    `(is equalp ,type (with-env* ,@body)))
-  (defmacro check-constraint (var type &body body)
-    `(is equalp ,type (with-env ,@body (get-constraint ,var *top-level-constraint*))))
-  (defmacro with-constraint-dump (&body body)
-    `(with-env
-      ,@body
-      (hash-table-sorted-alist *top-level-constraint*))) )
+  (defmacro with-constraint (() &body body)
+    `(let ((constraint (make-constraint-set)))
+       ,@body)))
 
 
 
@@ -36,25 +17,39 @@
   (is eq ':integer (merge-constraint '(:alias x) :integer))
   (is eq ':integer (merge-constraint :integer '(:alias x))))
 
-(defmacro is-constraint (type &body body)
-  `(check-constraint
-    'x ,type
-    (macrolet ((add (type) `(add-constraint 'x ,type *top-level-constraint*)))
-      (progn
-        ,@body
-        (get-constraint 'x *top-level-constraint*)))))
+
+
+(define-test add-constraint%
+  (is eq :bool
+      (with-constraint ()
+        (redmoon.type::add-constraint% constraint 'x :bool))))
 
 (define-test add-get-constraint
-  (is-constraint :bool (add :bool))
-  (is-constraint :bool (add :bool) (add :bool))
-  (is-constraint nil (add :bool) (add :integer)))
+  (is eq :bool
+      (with-constraint ()
+        (get-constraint
+         (add-constraint constraint  'x :bool)
+         'x)))
+  (is eq :bool
+      (with-constraint ()
+        (setf constraint (add-constraint constraint 'x :bool))
+        (setf constraint (add-constraint constraint 'x :bool))
+        (get-constraint constraint 'x)))
+  (is eq nil
+      (with-constraint ()
+        (setf constraint (add-constraint constraint 'x :bool))
+        (setf constraint (add-constraint constraint 'x :integer))
+        (get-constraint constraint 'x))))
 
 (define-test add-alias
-  (is equalp '((a . (:alias x)) (x . (:alias a)))
-      (with-constraint-dump
-       (add-alias 'x 'a *top-level-constraint*)))
-  (is equalp '((a . (:alias x y)) (x . (:alias a)) (y . (:alias a)))
-      (with-constraint-dump
-       (add-alias 'x 'a *top-level-constraint*)
-       (add-alias 'y 'a *top-level-constraint*))))
+  (is equalp '(x . (:alias a))
+      (fset:lookup 'a (add-alias (make-constraint-set) 'x 'a)))
+  (is equalp '(a . (:alias x))
+      (fset:lookup 'a (add-alias (make-constraint-set) 'x 'a))))
+
+#+WIP
+(with-constraint ()
+  (setf constraint (add-alias constraint 'x 'a))
+  (add-alias constraint 'y 'a))
+
 

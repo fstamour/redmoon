@@ -53,34 +53,6 @@
            nil)))
 
 ;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; Environments
-;;;;
-
-(defun make-env (&optional plist)
-  "Creates an empty environments or optionally with some bindings."
-  (plist-hash-table plist))
-
-(defun copy-env (env)
-  "Make a copy of an environment."
-  (copy-hash-table env))
-
-(defun get-var (var env &optional (error-if-not-found t))
-  "Get the value of a variable from the environment.
-Functions are treated as variables that has their definiton as value."
-  (or (gethash var env)
-      (and error-if-not-found
-           (error "Undefined variable ~S" var))))
-
-(defun make-funcall-env (env)
-  "Create an environment with only the function definitons"
-  (let ((new-env (copy-hash-table env)))
-    (loop :for name :being :the :hash-keys :of env
-            :using (hash-value value)
-          :when (function? value)
-            :do (setf (gethash name new-env) value))
-    new-env))
-
-;;;;;;;;;;;;;;;;;;;;;;;;
 ;;;; Host-guest type conversions
 ;;;;
 

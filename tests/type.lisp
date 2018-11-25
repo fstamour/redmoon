@@ -1,24 +1,20 @@
 
-(in-package #:redmoon.test.type)
+(in-package :redmoon.test.type)
 
 (define-test integer!
-  (is-type* :integer (integer! 2))
-  (is-type* nil
+  (is-type :integer (integer! 2 *context*))
+  (is-type nil
             (add-constraint 'x :bool *top-level-constraint*)
-            (integer! 'x))
-  (is-type* :integer (integer! 'x)))
-
-;; TOOD define-test integer*
+            (integer! 'x *context*))
+  (is-type :integer (integer! 'x *context*x)))
 
 (define-test bool!
-  (is-type* :bool (bool! 'true))
-  (is-type* :bool (bool! 'false))
-  (is-type* :integer (bool! 42)) ;; That's not confusing at all.
-  (is-type* nil
-    (add-constraint 'x :integer *top-level-constraint*)
-    (bool! 'x)))
-
-;; TOOD define-test bool*
+  (is-type :bool (bool! 'true *context*))
+  (is-type :bool (bool! 'false *context*))
+  (is-type :integer (bool! 42 *context*)) ;; That's not confusing at all.
+  (is-type nil
+    (add-constraint 'x :integer *context*)
+    (bool! 'x *context*)))
 
 (define-test comparison
   (is-type :bool  (typeof '(< 1 0)))
@@ -77,3 +73,4 @@
   (is-type :bool (typeof '(while :false :false)))
   (is-type :integer (typeof '(while :true 1)))
   (is-type :integer (typeof '(while :false 1))))
+
