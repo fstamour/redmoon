@@ -16,6 +16,25 @@
 (defparameter *constraint-type* (make-hash-table)
   "Special variable to keep track of all the type of contraints defined.")
 
+(defun define-contraint-assert! (name)
+  `(defun ,(symbolicate name '!) (form env constraint)
+     ,(format nil "Put the constraint ~A on the form and propagate." name)
+     (if (,(symbolicate name '?) form)
+         ,(make-keyword name)
+         (if (var? form)
+             (add-constraint form ,(make-keyword name) constraint)
+             (typeof form env constraint)))))
+
+(defun define-contraint-assert* (name)
+  `(defun ,(symbolicate name '*) (form env constraint)
+     ,(format nil "Put the constraint ~A on each part of the form and propagate." name)
+     ;; (e.g. form == (rest '(+ 1 2 3)))
+     (if (every #'(lambda (form)
+                    (,(symbolicate name '!) form env constraint))
+                form)
+         ,(make-keyword name)
+         (list :type-error (format nil "~S" form)))))
+
 (defmacro defconstraint (name docstring)
   "Defines 2 function <name>! and <name>* and register the name in *constraint-type*.
 They are helper functions that bridges the function named <name>? and the type inference.
@@ -27,21 +46,8 @@ And typeof needs the environment to get the function definitions."
   (check-type docstring string)
   `(progn
      (setf (gethash ',name *constraint-type*) ',docstring)
-     (defun ,(symbolicate name '!) (form env constraint)
-       ,(format nil "Put the constraint ~A on the form and propagate." name)
-       (if (,(symbolicate name '?) form)
-           ,(make-keyword name)
-           (if (var? form)
-               (add-constraint form ,(make-keyword name) constraint)
-               (typeof form env constraint))))
-     (defun ,(symbolicate name '*) (form env constraint)
-       ,(format nil "Put the constraint ~A on each part of the form and propagate." name)
-       ;; (e.g. form == (rest '(+ 1 2 3)))
-       (if (every #'(lambda (form)
-                      (,(symbolicate name '!) form env constraint))
-                  form)
-           ,(make-keyword name)
-           (list :type-error (format nil "~S" form))))))
+     ,(define-contraint-assert! name)
+     ,(define-contraint-assert* name)))
 
 (defconstraint integer "see integer?")
 

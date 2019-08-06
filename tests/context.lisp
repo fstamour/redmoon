@@ -16,10 +16,6 @@
                      (get-function 'f *context*))))
 
 
-(with-context ()
-  (get-function 'f))
-(test* 'get-function)
-
 (define-test set-function
   (is equal '(def f () (+ 1 2)) ;; '(+ 1 2)
       (with-context ()
@@ -29,6 +25,6 @@
 (defun test* (spec)
   (with-output-to-string (*standard-output*)
     (test spec)))
-
+#+nil
 (test* 'set-function)
 

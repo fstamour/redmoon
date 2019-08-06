@@ -33,14 +33,14 @@
 (defun test-all (&optional exit-p)
   (or
    (test '(
-           :redmoon.test
-           :redmoon.test.core.macros
+           ;; :redmoon.test
+           :redmoon.core.macros.test
            :redmoon.core.test
-           :redmoon.test.type
+           :redmoon.type.test
            ))
    (exit -1 (not exit-p))))
 
-(uiop:define-package :redmoon.test.type
+(uiop:define-package :redmoon.type.test
     (:mix
      :redmoon.type :redmoon.test
      :alexandria :cl))

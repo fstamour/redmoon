@@ -58,12 +58,12 @@ ci/sbcl-test.sh
 
 ```sh
 * (require :redmoon.test)
-* (in-package :redmoon.test.core)
+* (in-package :redmoon.core.test)
 * (test '/)
-        ？ REDMOON.TEST.CORE::/
+        ？ REDMOON.CORE.TEST::/
   0.000 ✔   (is = 3 (eval '(/ 10 3)))
   0.000 ✔   (is = 0 (eval '(/ x 5) (make-env '(x 2))))
-  0.006 ✔ REDMOON.TEST.CORE::/
+  0.006 ✔ REDMOON.CORE.TEST::/
 
 ;; Summary:
 Passed:     2

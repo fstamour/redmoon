@@ -12,6 +12,7 @@
                 ((:file third-party-fix)
                  (:file package)
                  (:file test-utils)
+                 (:file context)
                  (:file walker)
                  (:file eval)
                  (:file core)

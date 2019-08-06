@@ -1,5 +1,5 @@
 
-(in-package :redmoon.test.type)
+(in-package :redmoon.type.test)
 
 (define-test integer!
   (is-type :integer (integer! 2 *context*))

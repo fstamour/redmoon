@@ -32,21 +32,23 @@
 
 
 (define-test eval/atom
-  (is = 1 (eval 1))
-  (is eq :false (eval :false))
+  (is = 1 (eval nil 1))
+  (is eq :false (eval nil :false))
   (is = 42 (with-context ()
-             (set-variable )
+             (set-variable *context* 'x 42)
              (eval 'x *context*))))
 
 (define-test eval/sequence
-  (is = 4 (eval '(2 3 4)))
-  (is = 3 (eval '((+ 1 2))))
-  (is = 4 (eval '((+ x 2)) (make-env '(x 2)))))
+  (is = 4 (eval nil '(2 3 4)))
+  (is = 3 (eval nil '((+ 1 2))))
+  (is = 4 (with-context (x 2)
+            (eval *context* '((+ x 2))))))
 
 (define-test not
-  (is eq :false (eval-not '(not :true) (make-env)))
-  (is eq :true (eval-not '(not :false) (make-env)))
-  (is eq :true (eval-not '(not x) (make-env '(x :false)))))
+  (is eq :false (eval-not nil '(not :true)))
+  (is eq :true (eval-not nil '(not :false)))
+  (is eq :true (with-context (x :false)
+                 (eval-not *context* '(not x)))))
 
 (defun truth-table (op n)
   (apply #'map-product

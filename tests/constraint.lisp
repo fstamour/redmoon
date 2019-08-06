@@ -1,5 +1,5 @@
 
-(in-package #:redmoon.test.type)
+(in-package #:redmoon.type.test)
 
 (eval-when (:compile-toplevel :load-toplevel :execute)
   (defmacro with-constraint (() &body body)
