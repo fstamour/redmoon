@@ -49,6 +49,7 @@
    :eval :not :and :or)
   (:use :redmoon)
   (:shadowing-import-from :parachute
+   :featurep ;; defined both in alexandria and parachute
    :true :false
    :of-type)
   (:use :parachute)
