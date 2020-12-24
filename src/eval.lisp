@@ -24,12 +24,17 @@
 
 (in-package #:redmoon.eval)
 
+;; This is called when creating a new context.
 (defun make-environment ()
+  "Create an empty environment. An environment contains
+definitions (and values)."
   (fset:map))
 
 (context:defconstructor variable-value
+  "Create an empty environment when a context is created."
   (fset:with context :environment (make-environment)))
 
+;; Create an utility function to get the environment from a context.
 (context:defaccessor :environment)
 
 (defun get-variable (context var)
@@ -110,8 +115,10 @@
                  :for truth = (eval f context)
                  :always (not (truep truth)))))
 
+;; FIXME This looks wrong, it uses (setf (gethash ...)) when we are
+;; currently using immutable data structures from fset.
 (defun eval-def (form context)
-  "Add a definition to the contextiroment."
+  "Add a definition to the environment."
   ;; TODO Warn about re-defining something.
   (setf (gethash (second form) context) (cddr form)))
 
@@ -140,12 +147,15 @@ Just like progn in lisp."
 
 
 (defun eval-arithmetic-and-comparison (form context)
+  "Evaluate arithmetic and comparison expressions."
   (let ((result (apply (symbol-function (car form))
                        (map-eval (rest form) context))))
     (if (numberp result)
         (nth-value 0 (floor result))
         (to-bool result))))
 
+;; Weave the eval-* function together into a new function called
+;; "eval"
 (redmoon.core.macros:define-processor
     eval
   :group-arithmetic-and-comparison t

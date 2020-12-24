@@ -1,3 +1,4 @@
+;;;; type inference of variables and functions
 
 (in-package redmoon.type)
 

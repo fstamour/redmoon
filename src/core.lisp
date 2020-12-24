@@ -1,11 +1,8 @@
+;;;; core predicates that define the language
 
 (in-package #:redmoon)
 
-;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; Predicates
-;;;;
-
-;;; Symbolics
+;;; Predicate on symbols
 
 (defun keyword? (form)
   "Returns true if the form is a keyword of the language."
@@ -31,7 +28,7 @@
   "Returns true if the form is not a list."
   (not (listp form)))
 
-;;; Value Types
+;;; Predicate on values
 
 (defun integer? (form)
   "Returns true if the form is an integer (same as lisp's integerp)."
@@ -52,9 +49,7 @@
            t
            nil)))
 
-;;;;;;;;;;;;;;;;;;;;;;;;
-;;;; Host-guest type conversions
-;;;;
+;;; Host-guest type conversions
 
 (defun to-bool (b)
   "Convert a generalized boolean to the keyword :true or :false."
@@ -68,4 +63,3 @@
         (unless (eq :false b)
           (when error-if-invalid
             (error "Boolean values must be 'true' or 'false'. Got ~S" b))))))
-

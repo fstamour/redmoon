@@ -1,3 +1,5 @@
+;;;; low-level functions to manipulate constraints and set of
+;;;; constraints
 
 (in-package #:redmoon.type)
 
@@ -26,6 +28,7 @@
   constraint)
 
 (defun make-constraint-set  ()
+  "Create an empty set of constraint"
   (fset:map))
 
 (context:defconstructor constraint
@@ -52,4 +55,3 @@
   (alet
       (add-constraint constraint var2 (list :alias var1))
     (add-constraint it var1 (list :alias var2))))
-

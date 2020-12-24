@@ -1,3 +1,5 @@
+;;;; abstract and extensible context that is passed everywhere when
+;;;; processing a piece of code
 
 (in-package #:cl-user)
 
@@ -58,8 +60,10 @@
 ;; TODO Maybe use some setf-expander instead of those ugly macros?
 
 (defmacro defaccessor (name #+nil &optional) ;; Could be extended
+  "Helper to define functions to access specific parts of the context."
   `(defun ,(symbolicate 'context- name)
        (context)
+       ,(format nil "Get the ~(~a~) from a context." name)
      (fset:lookup context ,(make-keyword name))))
 
 (defmacro defaccessor* (&rest accessor-spec-list)
@@ -87,4 +91,3 @@
                 (with (context-function-definition *context*)
                       name
                       (list name lambda-list body))))))
-

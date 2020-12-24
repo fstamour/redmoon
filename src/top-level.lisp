@@ -1,3 +1,4 @@
+;;;; common lisp function to interact with redmoon
 
 (in-package :redmoon)
 
@@ -16,4 +17,3 @@
   "Pretty print a variable or function form the current environment."
   (check-type symbol symbol)
   (pprint `(def ,symbol ,@(gethash symbol *context*))))
-
