@@ -2,7 +2,7 @@
 (in-package redmoon.type)
 
 (context:defconstructor
-    type-contraints
+    type-constraints
   (fset:map (fset:$ context)
             (:function-type (fset:map))
             (:variable-type (fset:map))))
@@ -11,43 +11,60 @@
     :function-type
     :variable-type)
 
+;;; FIXME I think I meant (2 years ago) to replace "env" and
+;;; "constraint" by "context"
+;;;
+;;; But that would require a huge refactor because I need to change
+;;; every function to return the new context (as opposed to modifying
+;;; the existing one).
+;;;
+;;; Also, all the "constraint" functions returns a "constraint set",
+;;; not the full context. Here we only update the constraint too, but
+;;; we need the environment to get the definitions
+;;;
+;;;
+;;l
+
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
 (defparameter *constraint-type* (make-hash-table)
-  "Special variable to keep track of all the type of contraints defined.")
+  "Special variable to keep track of all the type of constraints defined.")
 
-(defun define-contraint-assert! (name)
-  `(defun ,(symbolicate name '!) (form env constraint)
-     ,(format nil "Put the constraint ~A on the form and propagate." name)
-     (if (,(symbolicate name '?) form)
-         ,(make-keyword name)
-         (if (var? form)
-             (add-constraint form ,(make-keyword name) constraint)
-             (typeof form env constraint)))))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun define-constraint-assert! (name)
+    `(defun ,(symbolicate name '!) (form context)
+       ,(format nil "Put the constraint ~A on the form and propagate." name)
+       (if (,(symbolicate name '?) form)
+           ,(make-keyword name)
+           (if (var? form)
+               (add-constraint form ,(make-keyword name) constraint)
+               (typeof form env constraint))))))
 
-(defun define-contraint-assert* (name)
-  `(defun ,(symbolicate name '*) (form env constraint)
-     ,(format nil "Put the constraint ~A on each part of the form and propagate." name)
-     ;; (e.g. form == (rest '(+ 1 2 3)))
-     (if (every #'(lambda (form)
-                    (,(symbolicate name '!) form env constraint))
-                form)
-         ,(make-keyword name)
-         (list :type-error (format nil "~S" form)))))
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defun define-constraint-assert* (name)
+    `(defun ,(symbolicate name '*) (form env constraint)
+       ,(format nil "Put the constraint ~A on each part of the form and propagate." name)
+       ;; (e.g. form == (rest '(+ 1 2 3)))
+       (if (every #'(lambda (form)
+		      (,(symbolicate name '!) form env constraint))
+		  form)
+	   ,(make-keyword name)
+	   (list :type-error (format nil "~S" form))))))
 
-(defmacro defconstraint (name docstring)
-  "Defines 2 function <name>! and <name>* and register the name in *constraint-type*.
+(eval-when (:compile-toplevel :load-toplevel :execute)
+  (defmacro defconstraint (name docstring)
+    "Defines 2 function <name>! and <name>* and register the name in *constraint-type*.
 They are helper functions that bridges the function named <name>? and the type inference.
 
-Why those functions needs the environement, and not just the contraints?
+Why those functions needs the environement, and not just the constraints?
 Each of these functions needs the environment because they can call typeof.
 And typeof needs the environment to get the function definitions."
-  (check-type name symbol)
-  (check-type docstring string)
-  `(progn
-     (setf (gethash ',name *constraint-type*) ',docstring)
-     ,(define-contraint-assert! name)
-     ,(define-contraint-assert* name)))
+    (check-type name symbol)
+    (check-type docstring string)
+    `(progn
+       (setf (gethash ',name *constraint-type*) ',docstring)
+       ,(define-constraint-assert! name)
+       ,(define-constraint-assert* name))))
 
 (defconstraint integer "see integer?")
 
@@ -69,7 +86,7 @@ Actually creates a string, should probably be a condition."
    ((keyword? atom) :keyword)))
 
 (defun typeof-if-statement (form env constraint)
-  "Infer the type an if statement (i.e. an if whithin a sequence). Updates the contraints."
+  "Infer the type an if statement (i.e. an if whithin a sequence). Updates the constraints."
   (destructuring-bind (test-form then-form &optional else-form)
       (rest form)
     (if (eq :bool (typeof test-form env constraint))
@@ -80,7 +97,7 @@ Actually creates a string, should probably be a condition."
         (make-type-error "Malformed if: ~S" form))))
 
 (defun typeof-if-expression (form env constraint)
-  "Infer the type an if expression. Updates the contraints."
+  "Infer the type an if expression. Updates the constraints."
   (destructuring-bind (test-form then-form else-form)
       (rest form)
     (if (eq :bool (typeof test-form env constraint))
@@ -92,13 +109,13 @@ Actually creates a string, should probably be a condition."
                          form))))
 
 (defun typeof-sequence (form env constraint)
-  "Infer the types of every parts of a sequence. Updates the contraints."
+  "Infer the types of every parts of a sequence. Updates the constraints."
   (dolist-butlast (f form)
                   (typeof f env constraint nil)
                   (typeof f env constraint t)))
 
 (defun typeof-function (name env constraint)
-  "Infer the type of a function, its arguments and return value. Updates the contraints."
+  "Infer the type of a function, its arguments and return value. Updates the constraints."
   (let ((definition (get-var name env))
         (new-constraint (copy-hash-table constraint)))
     (destructuring-bind (arguments &body body)
@@ -114,7 +131,7 @@ Actually creates a string, should probably be a condition."
         `(:function ,@arguments-types ,return-type)))))
 
 (defun typeof-funcall (form env constraint)
-  "Infer the type of the expression passed as arguments to a function. Updates the contraints."
+  "Infer the type of the expression passed as arguments to a function. Updates the constraints."
   ;; Compute type for each expression passed as argument in the function call.
   (loop :for expression :in (rest form)
         :do (typeof expression env constraint))
@@ -158,7 +175,7 @@ The form should look like (set [variable value]*)."
   (integer* (rest form) env))
 
 (defun typeof (form context &optional (expression-p t))
-  "Infer the type of a form. Updates the contraints.
+  "Infer the type of a form. Updates the constraints.
 It needs the enviroment to get the definitions of existing functions."
   (unless form
     (error "Invalid form 'NIL'"))
@@ -193,4 +210,3 @@ It needs the enviroment to get the definitions of existing functions."
              (typeof-funcall form env constraint)
 ;;; Sequence
              (typeof-sequence form env constraint))))))
-
