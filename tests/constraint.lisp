@@ -22,7 +22,9 @@
 (define-test add-constraint%
   (is eq :bool
       (with-constraint ()
-        (redmoon.type::add-constraint% constraint 'x :bool))))
+	(get-constraint
+	 (redmoon.type::add-constraint% constraint 'x :bool)
+	 'x))))
 
 (define-test add-get-constraint
   (is eq :bool
@@ -42,14 +44,14 @@
         (get-constraint constraint 'x))))
 
 (define-test add-alias
-  (is equalp '(x . (:alias a))
-      (fset:lookup 'a (add-alias (make-constraint-set) 'x 'a)))
-  (is equalp '(a . (:alias x))
-      (fset:lookup 'a (add-alias (make-constraint-set) 'x 'a))))
+  (is equalp '(x (:alias a))
+      (multiple-value-list
+       (fset:find 'x (add-alias (make-constraint-set) 'x 'a))))
+  (is equalp '(a (:alias x))
+      (multiple-value-list
+       (fset:find 'a (add-alias (make-constraint-set) 'x 'a)))))
 
 #+WIP
 (with-constraint ()
   (setf constraint (add-alias constraint 'x 'a))
   (add-alias constraint 'y 'a))
-
-
