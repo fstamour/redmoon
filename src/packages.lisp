@@ -1,34 +1,17 @@
+
 (in-package :cl-user)
 
-(defpackage redmoon.utils
-  (:use cl
-        alexandria)
-  (:import-from checkl
-                check
-                results)
-  (:export dolist-butlast))
-
-(defpackage redmoon
-  (:use cl
+(uiop:define-package redmoon
+  (:mix cl
         alexandria
-        redmoon.utils)
-  (:import-from checkl
-                check
-                results)
+        redmoon.utils
+        redmoon.symbol)
+  (:use-reexport redmoon.symbol)
   (:export
 
    ;; Main interface
    eval
-   def
    run
-
-   ;; keywords
-   true false
-   + - * / mod = /= < > <= >=
-   not and or
-   set
-   while
-   if
 
    ;; Environment
    get-var
@@ -67,9 +50,6 @@
         anaphora
         redmoon
         redmoon.utils)
-  (:import-from checkl
-                check
-                results)
   (:shadowing-import-from redmoon
                           eval
                           integer?

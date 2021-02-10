@@ -134,6 +134,11 @@ The form should look like (set [variable value]*)."
     (bool! cond env constraint)
     (typeof-sequence body env constraint)))
 
+#+nil (defun typeof-arithmetic-and-comparison ())
+#+nil (fmakunbound 'typeof-arithmetic-and-comparison)
+#+nil (redmoon.core.macros:define-processor typeof
+          :group-arithmetic-and-comparison t)
+
 (defun typeof (form  &optional
                        (env redmoon::*top-level-environment*)
                        (constraint *top-level-constraint*)
