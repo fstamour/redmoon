@@ -1,0 +1,72 @@
+#+title: Redmoon
+
+Toy programming language that I created to learn about formal methods
+and static analysis
+
+* Dependencies
+
+- alexandria
+- anaphora
+
+** For the test system
+
+- parachute
+- checkl
+
+* How to use
+
+Load the system
+
+#+begin_src lisp
+(ql:quickload "redmoon")
+;; or
+(asdf:load-system "redmoon")
+#+end_src
+
+Evaluate a form
+
+#+begin_src lisp
+(in-package #:redmoon.user)
+
+(run (oddp 2))
+#+end_src
+
+Run the tests
+
+#+begin_src lisp
+(asdf:test-system "redmoon")
+#+end_src
+
+or
+
+#+begin_src shell
+ci/sbcl-test.sh
+#+end_src
+
+* Reference
+
+Here are some (common lisp, not redmoon) functions and macros that are
+accessible in `redmoon.user` package:
+
+- ~def~
+- ~run~
+- ~typeof~
+- ~inspect~
+
+**WARNING** The ~common-lip~ package is not ~:use~'d by
+  ~redmoon.user~, meaning that if you want to use a symbol from
+  standard common lisp, you must qualify it. For example you must use
+  ~cl:defun~, not just ~defun~.
+
+* The language
+
+The language is designed to be very minimal.
+
+- lisp syntax
+- imperative
+- typed (100% inferred at the moment)
+- `if`, `set`, `while`
+- + - * / = /= < > <= >=
+- Only 2 types
+   - boolean (:true :false)
+   - integer (lisp's integer, i.e. no limit except the heap)

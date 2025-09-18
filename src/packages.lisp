@@ -90,6 +90,7 @@
            #:bool*))
 
 (defpackage redmoon.user
+  ;; TODO Why did I both :use and :import-from redmoon?
   (:use redmoon)
   (:import-from redmoon
                 def
