@@ -1,27 +1,13 @@
 (in-package :cl-user)
 
-(defpackage redmoon.utils
-  (:use cl
-        alexandria)
-  (:import-from checkl
-                check
-                results)
-  (:export dolist-butlast))
-
 (defpackage redmoon
-  (:use cl
-        alexandria
-        redmoon.utils)
-  (:import-from checkl
-                check
-                results)
+  (:use cl alexandria)
   (:export
-
    ;; Main interface
    eval
    def
    run
-
+   inspect
    ;; keywords
    true false
    + - * / mod = /= < > <= >=
@@ -29,24 +15,20 @@
    set
    while
    if
-
-   ;; Environment
+   ;;; Environment
    get-var
    make-env
    copy-env
    *top-level-environment*
    make-constraint-set
    *top-level-constraint*
-
-   ;; Predicates
+   ;;; Predicates
    assignation? atom? keyword? var?
    bool? integer? function?
-
-   ;; Host-guest type conversions
+   ;;; Host-guest type conversions
    to-bool
    truep
-
-   ;; All kind of evaluations
+   ;;; All kind of evaluations
    eval-atom
    eval-set
    eval-if
@@ -65,11 +47,8 @@
   (:use cl
         alexandria
         anaphora
-        redmoon
-        redmoon.utils)
-  (:import-from checkl
-                check
-                results)
+        redmoon)
+  (:shadowing-import-from cl inspect)
   (:shadowing-import-from redmoon
                           eval
                           integer?
@@ -90,13 +69,9 @@
            #:bool*))
 
 (defpackage redmoon.user
-  ;; TODO Why did I both :use and :import-from redmoon?
   (:use redmoon)
-  (:import-from redmoon
-                def
-                run
-                inspect)
   (:import-from redmoon.type
                 typeof)
   (:export oddp evenp
-           exp))
+           max min abs
+           exp log2 sqrt))

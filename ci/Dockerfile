@@ -11,7 +11,7 @@ RUN sbcl --noinform --non-interactive --load quicklisp.lisp --eval '(quicklisp-q
 COPY ci/sbclrc /root/.sbclrc
 
 # Fetching the dependencies first
-RUN sbcl --noinform --eval "(map nil 'ql:quickload '(anaphora alexandria checkl parachute))"
+RUN sbcl --noinform --eval "(map nil 'ql:quickload '(anaphora alexandria parachute))"
 
 WORKDIR /root/quicklisp/local-projects/redmoon
 COPY . /root/quicklisp/local-projects/redmoon
@@ -22,4 +22,3 @@ RUN sbcl --noinform --eval '(ql:quickload :redmoon.test)' \
 
 ENTRYPOINT ["sbcl", "--noinform", "--core", "redmoon.core"]
 CMD ["--non-interactive", "--eval", "(asdf:test-system :redmoon)"]
-

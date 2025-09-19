@@ -11,7 +11,6 @@ and static analysis
 ** For the test system
 
 - parachute
-- checkl
 
 * How to use
 

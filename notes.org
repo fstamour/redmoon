@@ -1,6 +1,7 @@
 
 * Grammar
 
+#+begin_example
 S ::= skip
       | x := E
       | S; S
@@ -8,6 +9,7 @@ S ::= skip
       | while B do D od
 B ::= true | false | not B | B and B | B or B | E ~ E
 E ::= n | x | -E | E + E | (E * E) | (E / E)
+#+end_example
 
 * Environment
 
@@ -41,12 +43,81 @@ NOTE: The only place an "if" is not an expression is inside a sequence.
 Is there a difference between a while statement or expression?
 
 * Other ideas
-** Signature of programs (e.g. hash, "structural hash" (i.e. two code that have the same structural hash has the same structure).
-** compile-to-asm, disasm, compile-t-lisp
+** Signature of programs
+
+- hash
+- "structural hash"
+  - two code that have the same structural hash has the same
+    structure
+
+** Tree shaking
+
+** Partial evaluator
+
+http://repository.readscheme.org/ftp/papers/pe98-school/hatcliff-DIKU-PE-summerschool.pdf
+http://delivery.acm.org/10.1145/250000/243447/p480-jones.pdf?ip=132.207.247.233&id=243447&acc=ACTIVE%20SERVICE&key=FD0067F557510FFB%2EC32CC723E17B05B2%2E4D4702B0C3E38B35%2E4D4702B0C3E38B35&CFID=872252326&CFTOKEN=12745666&__acm__=1480948726_a6b42cede16460c46aa1a3738ad58b6c
+
+
+1. Collect all reachable state
+2. Program point specialization. For each reachable state replace the block (expression) by a specialized version of it.
+
+(def mul (a b) (* a b))
+
+(mul 1 x) => ((x) (* 1 x))
+
+** Probabilistic optimization
+
+e.g. There are more chance of `this` happening than `that`.
+
+see also PGO - Profile Guided Optimization
+
+** compile-to-asm, disasm, compile-to-lisp
 ** Macros! (might render the proofs complex)
+
+
+** Suspend/resume execution
+
+From the code source, we could probably figure out what is needed to stop/save/resume an ongoing function.
+
+Where can we stop an execution?
+What needs to be saved?
+How do we save deeply nested function call?
+How do we load deeply needed function call?
+How do we stop an execution?
+How do we resume an execution?
+
+**  Some optimizations
+
+#+begin_src lisp
+(set x 10
+	   y 0)
+(while (> x 0)
+	(set x (- x 2))
+	(if (evenp x)
+		  (set y (+ y 1))
+		  (set y (- y 1))))
+#+end_src
+
+(evenp (a) (= 0 (mod a 2)))
+(mod a n) == (mod (+/- a n) n) && (set x (- x 2)) ==> (evenp x) is "constant"!
+"What changes to a parameter makes a function <<invariant>>?"
+
+==> if's condition is always true
+==> (set y (* (/ x 2))) => (set y 5)
+
+
 ** Analyze
 *** Order (e.g. O(n), O(n^2))
 *** Correctness
+*** Is the function written in Single Assignment form?
+
+Does it set a variable more than once?
+
 ** We could augment the constraints with pre/post conditions.
 
 
+#+begin_comment
+=============================================
+WTF Gödel encoding is exactly what I tried...
+=============================================
+#+end_comment

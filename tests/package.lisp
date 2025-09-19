@@ -44,10 +44,9 @@
    (exit -1 (not exit-p))))
 
 (uiop:define-package :redmoon.test.core
-  (:use :cl :alexandria)
+  (:use :redmoon :cl :alexandria)
   (:shadowing-import-from :redmoon
-   :eval :not :and :or)
-  (:use :redmoon)
+   :eval :not :and :or :inspect)
   (:shadowing-import-from :parachute
    :featurep ;; defined both in alexandria and parachute
    :true :false
@@ -61,4 +60,3 @@
     (:mix
      :redmoon.type :redmoon.test
      :alexandria :cl))
-

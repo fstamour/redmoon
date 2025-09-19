@@ -77,11 +77,13 @@ Actually creates a string, should probably be a condition."
         (make-type-error "Malformed if (the condition is not a boolean expression): ~S"
                          form))))
 
-(defun typeof-sequence (form env constraint)
+(defun typeof-sequence (forms env constraint)
   "Infer the types of every parts of a sequence. Updates the contraints."
-  (dolist-butlast (f form)
-                  (typeof f env constraint nil)
-                  (typeof f env constraint t)))
+  (loop :for (form . rest) :on forms
+        :for lastp := (not rest)
+        :for type := (typeof form env constraint lastp)
+        :when lastp
+          :return type))
 
 (defun typeof-function (name env constraint)
   "Infer the type of a function, its arguments and return value. Updates the contraints."
@@ -173,4 +175,3 @@ It needs the enviroment to get the definitions of existing functions."
              (typeof-funcall form env constraint)
 ;;; Sequence
              (typeof-sequence form env constraint))))))
-

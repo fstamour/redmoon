@@ -48,16 +48,3 @@
               (redmoon.type:*top-level-constraint*
                (alexandria:copy-hash-table redmoon.type:*top-level-constraint*))))
      ,@body))
-
-(let
-    (def max (x y) (if (< x y) y x))
-  (def min (x y) (if (> x y) y x))
-
-  (checkl:check  (:name :min-max-functions)
-                 (type:typeof 'max)
-                 (type:typeof 'min)) 
-
-
-
-  asdf)
-

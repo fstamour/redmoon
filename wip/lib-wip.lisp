@@ -1,35 +1,6 @@
 
 (cl:in-package :redmoon.user)
 
-(def max (x y)
-  (if (> x y) x y))
-
-(def min (x y)
-  (if (> x y) y x))
-
-(def abs (x)
-  (if (< 0 x) (- x) x))
-
-(def log2 (x)
-  (set n 0)
-  (while (> 0 x)
-    (if (evenp x)
-        (set x (/ x 2)
-             n (+ n 1))
-        (set x (- x 1)))))
-
-(def sqrt (n)
-  ;; (if (< 1 n) (return 0))
-  ;; (if (= 1 n) (return 1))
-  (set x0 (/ n 2)
-       x1 (/ (+ (/ n x0)) 2))
-  (while (> (abs (- x1 x0)) 1)
-    (set x0 x1
-         x1 (/ (+ (/ n x0)) 2)))
-  (while (> (* x1 x1) n)
-    (set x1 (- x1 1)))
-  x1)
-
 (def elegant-pair (x y)
   (if (> x y)
       (+ (* x x) x y)
@@ -47,10 +18,10 @@
   #(x y))
 
 
-(def encode (x)
+(def encode (n)
   (if (< n 0) (- n 1) (+ n 1)))
 
-(def decode (x)
+(def decode (n)
   (if (< n 0) (+ n 1) (- n 1)))
 
 ;; Needs 'list' and 'for'.
@@ -68,5 +39,3 @@
     (set result (list y result)
          (x y) (elegant-unpair x)))  ;; And here
   resutl)
-
-
